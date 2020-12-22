@@ -32,10 +32,17 @@ namespace DropZone
             }
             catch (Exception ex)
             {
-                ShowError($"Error while receiving files{Environment.NewLine}Detail: ${ex.Message}");
+                ShowError($"Error while receiving files{Environment.NewLine}Detail: {ex.Message}");
             }
 
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            try
+            {
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
+            catch
+            {
+                // ignored
+            }
 
             ThreadUtils.RunOnUiAndWait(() =>
             {
@@ -78,7 +85,6 @@ namespace DropZone
 
                     ThreadUtils.RunOnUiAndWait(() => Percent = 100);
                 }
-
             }
         }
 
@@ -107,6 +113,8 @@ namespace DropZone
         protected override void OnCleanUp()
         {
             _timer.Dispose();
+            var currentReceiver = _currentReceiver;
+            currentReceiver?.Dispose();
             _fileServer.Dispose();
         }
     }

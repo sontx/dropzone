@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace DropZone.Protocol
 {
@@ -75,6 +76,9 @@ namespace DropZone.Protocol
 
         private void SendBody(string file, NetworkStream stream)
         {
+#if DEBUG && LATENCY
+            var random = new Random(DateTime.Now.Millisecond);
+#endif
             using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var buffer = new byte[Constants.BUFFER_SIZE_SOCKET];
@@ -84,6 +88,9 @@ namespace DropZone.Protocol
                     if (readLength <= 0) break;
                     stream.Write(buffer, 0, readLength);
                     SentBytes += readLength;
+#if DEBUG && LATENCY
+                    Thread.Sleep(random.Next(Constants.DEBUG_MIN_DELAY, Constants.DEBUG_MAX_DELAY));
+#endif
                 } while (true);
 
                 stream.Flush();

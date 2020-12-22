@@ -12,29 +12,32 @@
                                      IsDesignTimeCreatable=True}"
     ResizeMode="CanResizeWithGrip"
     mc:Ignorable="d">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="{Binding Status}" TextAlignment="Right" />
-            <Grid>
-                <ProgressBar
-                    Height="20"
-                    Maximum="100"
-                    Value="{Binding Percent, Mode=OneWay}" />
-                <TextBlock
-                    VerticalAlignment="Center"
-                    FontStyle="Italic"
-                    Text="{Binding CurrentFileName}"
-                    TextAlignment="Center" />
-            </Grid>
-        </StackPanel>
-        <StackPanel Grid.Row="1">
-            <Button HorizontalAlignment="Right" Click="btnClose_OnClick">
-                <TextBlock Padding="20,0,20,0">Close</TextBlock>
-            </Button>
-        </StackPanel>
+    <Grid>
+        <Image Source="bg.png" />
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{Binding Status}" TextAlignment="Right" />
+                <Grid>
+                    <ProgressBar
+                        Height="20"
+                        Maximum="100"
+                        Value="{Binding Percent, Mode=OneWay}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontStyle="Italic"
+                        Text="{Binding CurrentFileName}"
+                        TextAlignment="Center" />
+                </Grid>
+            </StackPanel>
+            <StackPanel Grid.Row="1">
+                <Button HorizontalAlignment="Right" Click="btnClose_OnClick">
+                    <TextBlock Padding="20,0,20,0">Close</TextBlock>
+                </Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

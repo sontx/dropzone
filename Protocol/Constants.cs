@@ -9,5 +9,7 @@
         public static readonly ushort FILE_SERVER_PORT = 30393;
         public static readonly int BUFFER_SIZE_SOCKET = 8000;
         public static readonly int BUFFER_SIZE_HEADER = 2000;
+        public static readonly int DEBUG_MAX_DELAY = 10;
+        public static readonly int DEBUG_MIN_DELAY = 1;
     }
 }

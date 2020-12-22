@@ -82,7 +82,7 @@ namespace DropZone
         {
             ThreadUtils.RunOnUiAndWait(() =>
             {
-                MessageBox.Show(msg, Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(msg, Title, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
             });
         }
 

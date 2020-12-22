@@ -21,27 +21,30 @@
     <Window.AllowDrop>
         <Binding Converter="{StaticResource NotBoolConverter}" Path="IsInitializing" />
     </Window.AllowDrop>
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <StackPanel VerticalAlignment="Center" Orientation="Vertical">
-            <TextBlock
-                FontStyle="Italic"
-                TextAlignment="Center"
-                Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Collapsed,Visible'}">
-                Drop files or folders here
-            </TextBlock>
-            <TextBlock
-                FontStyle="Italic"
-                Text="{Binding CurrentScannedFile}"
-                TextAlignment="Center"
-                Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
-            <ProgressBar
-                Height="5"
-                IsIndeterminate="True"
-                Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
-        </StackPanel>
+    <Grid>
+        <Image Source="bg.png"></Image>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel VerticalAlignment="Center" Orientation="Vertical">
+                <TextBlock
+                    FontStyle="Italic"
+                    TextAlignment="Center"
+                    Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Collapsed,Visible'}">
+                    Drop files or folders here
+                </TextBlock>
+                <TextBlock
+                    FontStyle="Italic"
+                    Text="{Binding CurrentScannedFile}"
+                    TextAlignment="Center"
+                    Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
+                <ProgressBar
+                    Height="5"
+                    IsIndeterminate="True"
+                    Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

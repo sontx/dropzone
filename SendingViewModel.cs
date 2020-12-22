@@ -35,10 +35,17 @@ namespace DropZone
             }
             catch (Exception ex)
             {
-                ShowError($"Error while sending files{Environment.NewLine}Detail: ${ex.Message}");
+                ShowError($"Error while sending files{Environment.NewLine}Detail: {ex.Message}");
             }
 
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            try
+            {
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
+            catch
+            {
+                // ignored
+            }
 
             ThreadUtils.RunOnUiAndWait(() =>
             {
@@ -101,6 +108,8 @@ namespace DropZone
 
         protected override void OnCleanUp()
         {
+            var currentSender = _currentSender;
+            currentSender?.Dispose();
             _timer.Dispose();
         }
 
