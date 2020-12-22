@@ -2,6 +2,7 @@
 using DropZone.Protocol;
 using GalaSoft.MvvmLight;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +31,8 @@ namespace DropZone
             get => _hasNeighbors;
             private set => Set(ref _hasNeighbors, value);
         }
+
+        public ObservableCollection<NeighborMenuItemViewModel> NeighborMenuItems { get; } = new ObservableCollection<NeighborMenuItemViewModel>();
 
         public bool IsInitializing
         {
@@ -72,9 +75,18 @@ namespace DropZone
 
         private void UpdateNeighborsSummary()
         {
-            var neighbors = _station.Neighbors;
-            NeighborsSummary = neighbors.Count > 0 ? $"Online neighbors ({neighbors.Count})" : string.Empty;
-            HasNeighbors = neighbors.Count > 0;
+            ThreadUtils.RunOnUi(() =>
+            {
+                var neighbors = _station.Neighbors;
+                NeighborsSummary = neighbors.Count > 0 ? $"Online neighbors ({neighbors.Count})" : string.Empty;
+                HasNeighbors = neighbors.Count > 0;
+
+                NeighborMenuItems.Clear();
+                foreach (var neighbor in neighbors)
+                {
+                    NeighborMenuItems.Add(new NeighborMenuItemViewModel(this, neighbor));
+                }
+            });
         }
 
         private async void HandleResolver(Resolver resolver)
@@ -100,7 +112,7 @@ namespace DropZone
             }
         }
 
-        public async void SendFiles(string[] files)
+        public async void SendFiles(string[] files, Station.Neighbor toNeighbor = null)
         {
             if (files == null || files.Length == 0)
                 return;
@@ -108,17 +120,23 @@ namespace DropZone
             CurrentScannedFile = string.Empty;
             IsInitializing = true;
 
-            var neighbors = _station.Neighbors;
-
             await Task.Run(() =>
             {
                 var fileModels = GetSendingModels(files);
 
                 IsInitializing = false;
 
-                foreach (var neighbor in neighbors)
+                if (toNeighbor == null)
                 {
-                    RequestSendingFiles(fileModels, neighbor);
+                    var neighbors = _station.Neighbors;
+                    foreach (var neighbor in neighbors)
+                    {
+                        RequestSendingFiles(fileModels, neighbor);
+                    }
+                }
+                else
+                {
+                    RequestSendingFiles(fileModels, toNeighbor);
                 }
             });
         }

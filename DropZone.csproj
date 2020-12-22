@@ -86,6 +86,7 @@
     <Compile Include="GalaSoft.MvvmLight\ViewModelBase.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\IDialogService.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\INavigationService.cs" />
+    <Compile Include="NeighborMenuItemViewModel.cs" />
     <Compile Include="NotBoolConverter.cs" />
     <Compile Include="Protocol\Constants.cs" />
     <Compile Include="Protocol\FileReceiver.cs" />

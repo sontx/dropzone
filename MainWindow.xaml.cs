@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DropZone
@@ -70,6 +71,14 @@ namespace DropZone
             {
                 HandleFiles(openFileDialog.FileNames);
             }
+        }
+
+        private void NeighborsLink_OnClick(object sender, RoutedEventArgs e)
+        {
+            var cm = FindResource("NeighborsMenu") as ContextMenu;
+            cm.PlacementTarget = sender as UIElement;
+            cm.DataContext = DataContext;
+            cm.IsOpen = true;
         }
     }
 }

@@ -16,6 +16,18 @@
     <Window.Resources>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <local:NotBoolConverter x:Key="NotBoolConverter" />
+        <ContextMenu x:Key="NeighborsMenu" ItemsSource="{Binding NeighborMenuItems}">
+            <ContextMenu.ItemContainerStyle>
+                <Style TargetType="{x:Type MenuItem}">
+                    <Setter Property="Command" Value="{Binding Command}" />
+                </Style>
+            </ContextMenu.ItemContainerStyle>
+            <ContextMenu.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:NeighborMenuItemViewModel}" ItemsSource="{Binding MenuItems}">
+                    <TextBlock Text="{Binding Header}" />
+                </HierarchicalDataTemplate>
+            </ContextMenu.ItemTemplate>
+        </ContextMenu>
     </Window.Resources>
     <Window.AllowDrop>
         <Binding Converter="{StaticResource NotBoolConverter}" Path="IsInitializing" />
@@ -62,7 +74,7 @@
                     </ItemsPanelTemplate>
                 </StatusBar.ItemsPanel>
                 <StatusBarItem Visibility="{Binding HasNeighbors, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}">
-                    <Hyperlink TextDecorations="">
+                    <Hyperlink Click="NeighborsLink_OnClick" TextDecorations="">
                         <StackPanel Orientation="Horizontal">
                             <Image
                                 Width="12"
