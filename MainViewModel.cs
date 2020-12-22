@@ -11,9 +11,11 @@ namespace DropZone
     public class MainViewModel : ViewModelBase
     {
         private readonly Master _master;
-        private readonly NeighborHelper _neighborHelper;
+        private readonly Station _station;
         private bool _isInitializing;
         private string _currentScannedFile;
+
+        public string Title { get; }
 
         public bool IsInitializing
         {
@@ -31,12 +33,15 @@ namespace DropZone
         {
             if (!IsInDesignMode)
             {
-                _neighborHelper = new NeighborHelper();
+                _station = new Station(RandomNames.GetRandomName());
                 _master = new Master(Constants.MASTER_PORT)
                 {
                     ResolverHandler = HandleResolver
                 };
                 _master.Start();
+                _station.Start();
+
+                Title = $"Drop Zone [{_station.Name}]";
             }
         }
 
@@ -71,8 +76,7 @@ namespace DropZone
             CurrentScannedFile = string.Empty;
             IsInitializing = true;
 
-            await _neighborHelper.RefreshAsync();
-            var neighbors = _neighborHelper.Neighbors;
+            var neighbors = _station.GetNeighbors();
 
             await Task.Run(() =>
             {
@@ -117,9 +121,9 @@ namespace DropZone
             return ret;
         }
 
-        private async void RequestSendingFiles(IEnumerable<SendFileModel> files, string requestTo)
+        private async void RequestSendingFiles(IEnumerable<SendFileModel> files, Station.Neighbor sendTo)
         {
-            var slaver = new Slaver(requestTo, Constants.MASTER_PORT);
+            var slaver = new Slaver(sendTo.Address, Constants.MASTER_PORT);
             var waitingOnPort = await slaver.RequestSendFilesAsync(files.Select(f => f.File));
 
             if (waitingOnPort > 0)
@@ -127,7 +131,7 @@ namespace DropZone
                 ThreadUtils.RunOnUi(() =>
                 {
                     var transferWindow = new TransferWindow();
-                    var sendingViewModel = new SendingViewModel(requestTo, waitingOnPort, files){Title = "Sender"};
+                    var sendingViewModel = new SendingViewModel(sendTo, waitingOnPort, _station.Name, files){Title = "Sender"};
                     transferWindow.DataContext = sendingViewModel;
                     transferWindow.Show();
                     sendingViewModel.Start();
@@ -138,6 +142,7 @@ namespace DropZone
         public void Close()
         {
             _master.Stop();
+            _station.Stop();
         }
     }
 }

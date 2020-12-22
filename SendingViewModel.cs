@@ -9,19 +9,21 @@ namespace DropZone
 {
     public class SendingViewModel : TransferViewModel
     {
-        private readonly string _host;
+        private readonly Station.Neighbor _neighbor;
         private readonly int _port;
+        private readonly string _name;
         private readonly List<SendFileModel> _sendingFiles;
         private readonly Thread _thread;
         private readonly Timer _timer;
         private FileSender _currentSender;
 
-        public SendingViewModel(string host, int port, IEnumerable<SendFileModel> sendingFiles)
+        public SendingViewModel(Station.Neighbor neighbor, int port, string name, IEnumerable<SendFileModel> sendingFiles)
         {
-            _host = host;
+            _neighbor = neighbor;
             _port = port;
+            _name = name;
             _sendingFiles = sendingFiles.ToList();
-            _thread = new Thread(DoInBackground);
+            _thread = new Thread(DoInBackground) { IsBackground = true };
             _timer = new Timer(UpdateProgress);
         }
 
@@ -73,7 +75,7 @@ namespace DropZone
             for (var i = 0; i < _sendingFiles.Count; i++)
             {
                 var sendingFile = _sendingFiles[i];
-                using (var sender = new FileSender(_host, _port))
+                using (var sender = new FileSender(_neighbor.Address, _port, _name))
                 {
                     _currentSender = sender;
 
@@ -88,7 +90,7 @@ namespace DropZone
 
                     sender.Connect();
 
-                    ThreadUtils.RunOnUiAndWait(() => { Title = $"Sending to {sender.RemoteIdentify}"; });
+                    ThreadUtils.RunOnUiAndWait(() => { Title = $"Sending to {_neighbor.Name} [{sender.RemoteIdentify}]"; });
 
                     sender.Send(sendingFile.File, sendingFile.BaseDir);
 

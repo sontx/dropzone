@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -10,17 +11,19 @@ namespace DropZone.Protocol
     {
         private readonly string _host;
         private readonly int _port;
+        private readonly string _name;
         private readonly TcpClient _client;
 
         public long TotalBytes { get; private set; }
         public long SentBytes { get; private set; }
 
-        public string RemoteIdentify => _client.Client.RemoteEndPoint?.ToString();
+        public string RemoteIdentify => (_client.Client.RemoteEndPoint as IPEndPoint)?.Address?.ToString();
 
-        public FileSender(string host, int port)
+        public FileSender(string host, int port, string name)
         {
             _host = host;
             _port = port;
+            _name = name;
             _client = new TcpClient();
         }
 
@@ -50,7 +53,7 @@ namespace DropZone.Protocol
             var fileInfo = new FileInfo(file);
             var name = fileInfo.Name;
             var size = fileInfo.Length;
-            var combined = $"{name}|{GetRelativeDir(file, baseDir)}|{size}";
+            var combined = $"{_name}|{name}|{GetRelativeDir(file, baseDir)}|{size}";
             var combinedBytes = Encoding.UTF8.GetBytes(combined);
 
             var lengthBytes = BitConverter.GetBytes(combinedBytes.Length);

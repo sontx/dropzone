@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -13,6 +14,7 @@ namespace DropZone.Protocol
         private string _fileName;
         private long _totalBytes;
         private string _relativeDir;
+        private string _from;
 
         public Action AcceptedHeader { get; set; }
 
@@ -20,6 +22,12 @@ namespace DropZone.Protocol
         {
             get => _fileName;
             private set => Set(ref _fileName, value);
+        }
+
+        public string From
+        {
+            get => _from;
+            private set => Set(ref _from, value);
         }
 
         public string RelativeDir
@@ -36,7 +44,7 @@ namespace DropZone.Protocol
 
         public long ReceivedBytes { get; private set; }
 
-        public string RemoteIdentify => _client.Client.RemoteEndPoint?.ToString();
+        public string RemoteIdentify => (_client.Client.RemoteEndPoint as IPEndPoint)?.Address?.ToString();
 
         public FileReceiver(TcpClient client, string saveDir)
         {
@@ -87,8 +95,9 @@ namespace DropZone.Protocol
             var combined = Encoding.UTF8.GetString(buffer, 0, headerLength);
             var parts = combined.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             var offset = 0;
+            From = parts[offset++];
             FileName = parts[offset++];
-            if (parts.Length == 3)
+            if (parts.Length == 4)
                 RelativeDir = parts[offset++];
             TotalBytes = long.Parse(parts[offset]);
         }

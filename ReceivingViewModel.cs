@@ -18,7 +18,7 @@ namespace DropZone
         {
             _fileServer = fileServer;
             _receivingFiles = receivingFiles.ToList();
-            _thread = new Thread(DoInBackground);
+            _thread = new Thread(DoInBackground) { IsBackground = true };
             _timer = new Timer(UpdateProgress);
         }
 
@@ -72,7 +72,7 @@ namespace DropZone
                     var receivingCount = i + 1;
                     ThreadUtils.RunOnUiAndWait(() =>
                     {
-                        Title = $"Receiving from {receiver.RemoteIdentify}";
+                        Title = "Receiver";
                         Status = $"Receiving {receivingCount}/{_receivingFiles.Count}";
                         Percent = 0;
                     });
@@ -81,6 +81,7 @@ namespace DropZone
                     {
                         ThreadUtils.RunOnUiAndWait(() =>
                         {
+                            Title = $"Receiving from {receiver.From} [{receiver.RemoteIdentify}]";
                             CurrentFileName = $"{receiver.FileName} ({FileUtils.BytesToString(receiver.TotalBytes)})";
                         });
                     };
