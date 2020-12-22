@@ -47,6 +47,7 @@ namespace DropZone
                 {
                     e.Cancel = true;
                     base.OnClosing(e);
+                    return;
                 }
             }
 
