@@ -158,5 +158,11 @@
   <ItemGroup>
     <Resource Include="bg.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="online.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="settings.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

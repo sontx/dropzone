@@ -40,22 +40,6 @@ namespace DropZone
             HandleFiles(files);
         }
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-        {
-            base.OnMouseLeftButtonUp(e);
-
-            if (DataContext is MainViewModel vm && vm.IsInitializing)
-            {
-                return;
-            }
-
-            var openFileDialog = new OpenFileDialog { Multiselect = true };
-            if (openFileDialog.ShowDialog() == true)
-            {
-                HandleFiles(openFileDialog.FileNames);
-            }
-        }
-
         protected override void OnClosed(EventArgs e)
         {
             if (DataContext is MainViewModel vm)
@@ -71,6 +55,20 @@ namespace DropZone
             if (DataContext is MainViewModel vm)
             {
                 vm.SendFiles(files);
+            }
+        }
+
+        private void DropArea_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is MainViewModel vm && vm.IsInitializing)
+            {
+                return;
+            }
+
+            var openFileDialog = new OpenFileDialog { Multiselect = true };
+            if (openFileDialog.ShowDialog() == true)
+            {
+                HandleFiles(openFileDialog.FileNames);
             }
         }
     }

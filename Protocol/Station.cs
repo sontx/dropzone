@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,7 +10,7 @@ using System.Threading;
 
 namespace DropZone.Protocol
 {
-    public class Station
+    public class Station : ObservableObject
     {
         private const string HEADER_PREFIX = "DROP_ZONE";
 
@@ -20,11 +21,14 @@ namespace DropZone.Protocol
         private readonly Timer _timer;
         private bool _closed;
 
-        public List<Neighbor> GetNeighbors()
+        public List<Neighbor> Neighbors
         {
-            lock (this)
+            get
             {
-                return _neighbors.Values.ToList();
+                lock (this)
+                {
+                    return _neighbors.Values.ToList();
+                }
             }
         }
 
@@ -65,7 +69,12 @@ namespace DropZone.Protocol
 
                     lock (this)
                     {
+                        var oldSize = _neighbors.Count;
+
                         _neighbors[address] = neighbor;
+
+                        if (oldSize != _neighbors.Count)
+                            RaisePropertyChanged(nameof(Neighbors));
                     }
                 }
             }
@@ -107,6 +116,9 @@ namespace DropZone.Protocol
                         _neighbors.Remove(pair.Key);
                     }
                 }
+
+                if (_neighbors.Count != pairs.Length)
+                    RaisePropertyChanged(nameof(Neighbors));
             }
         }
 

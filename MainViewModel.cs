@@ -14,8 +14,22 @@ namespace DropZone
         private readonly Station _station;
         private bool _isInitializing;
         private string _currentScannedFile;
+        private string _neighborsSummary;
+        private bool _hasNeighbors;
 
         public string Title { get; }
+
+        public string NeighborsSummary
+        {
+            get => _neighborsSummary;
+            private set => Set(ref _neighborsSummary, value);
+        }
+
+        public bool HasNeighbors
+        {
+            get => _hasNeighbors;
+            private set => Set(ref _hasNeighbors, value);
+        }
 
         public bool IsInitializing
         {
@@ -42,7 +56,25 @@ namespace DropZone
                 _station.Start();
 
                 Title = $"Drop Zone [{_station.Name}]";
+
+                UpdateNeighborsSummary();
+                _station.PropertyChanged += _station_PropertyChanged;
             }
+        }
+
+        private void _station_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Station.Neighbors))
+            {
+                UpdateNeighborsSummary();
+            }
+        }
+
+        private void UpdateNeighborsSummary()
+        {
+            var neighbors = _station.Neighbors;
+            NeighborsSummary = neighbors.Count > 0 ? $"Online neighbors ({neighbors.Count})" : string.Empty;
+            HasNeighbors = neighbors.Count > 0;
         }
 
         private async void HandleResolver(Resolver resolver)
@@ -76,7 +108,7 @@ namespace DropZone
             CurrentScannedFile = string.Empty;
             IsInitializing = true;
 
-            var neighbors = _station.GetNeighbors();
+            var neighbors = _station.Neighbors;
 
             await Task.Run(() =>
             {
@@ -96,7 +128,17 @@ namespace DropZone
             var ret = new LinkedList<SendFileModel>();
             foreach (var file in files)
             {
-                ThreadUtils.RunOnUiAndWait(() => CurrentScannedFile = file);
+                ThreadUtils.RunOnUiAndWait(() =>
+                {
+                    var name = Path.GetFileName(file);
+                    var dir = Path.GetDirectoryName(file);
+                    var ts = dir;
+                    var max = 16;
+                    var shortenDir = ts.Length > max
+                        ? ts.Substring(0, max) + "..." + ts.Substring((ts.Length - max), max)
+                        : ts;
+                    CurrentScannedFile = Path.Combine(shortenDir, name);
+                });
 
                 if (File.GetAttributes(file).HasFlag(FileAttributes.Directory))
                 {
@@ -131,7 +173,7 @@ namespace DropZone
                 ThreadUtils.RunOnUi(() =>
                 {
                     var transferWindow = new TransferWindow();
-                    var sendingViewModel = new SendingViewModel(sendTo, waitingOnPort, _station.Name, files){Title = "Sender"};
+                    var sendingViewModel = new SendingViewModel(sendTo, waitingOnPort, _station.Name, files) { Title = "Sender" };
                     transferWindow.DataContext = sendingViewModel;
                     transferWindow.Show();
                     sendingViewModel.Start();
