@@ -32,7 +32,8 @@ namespace DropZone
             }
             catch (Exception ex)
             {
-                ShowError($"Error while receiving files{Environment.NewLine}Detail: {ex.Message}");
+                if (!_canceled)
+                    ShowError($"Error while receiving files{Environment.NewLine}Detail: {ex.Message}");
             }
 
             try
@@ -44,13 +45,16 @@ namespace DropZone
                 // ignored
             }
 
-            ThreadUtils.RunOnUiAndWait(() =>
+            if (!_canceled)
             {
-                Status = "Done!";
-                Percent = 100;
-            });
+                ThreadUtils.RunOnUiAndWait(() =>
+                {
+                    Status = "Done!";
+                    Percent = 100;
+                });
 
-            Thread.Sleep(500);
+                Thread.Sleep(300);
+            }
 
             _currentReceiver = null;
 
@@ -82,6 +86,9 @@ namespace DropZone
                     };
 
                     receiver.Receive();
+
+                    if (receiver.ReceivedBytes < receiver.TotalBytes)
+                        throw new Exception("Operation was aborted by sender");
 
                     ThreadUtils.RunOnUiAndWait(() => Percent = 100);
                 }

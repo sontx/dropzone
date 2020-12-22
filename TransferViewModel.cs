@@ -12,6 +12,7 @@ namespace DropZone
         private string _currentFileName;
         private int _percent;
         private string _status;
+        protected bool _canceled;
 
         public string Title
         {
@@ -39,6 +40,11 @@ namespace DropZone
 
         public void Cancel()
         {
+            if (_canceled)
+                return;
+
+            _canceled = true;
+
             try
             {
                 OnCancel();
@@ -82,7 +88,7 @@ namespace DropZone
         {
             ThreadUtils.RunOnUiAndWait(() =>
             {
-                MessageBox.Show(msg, Title, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
+                MessageBox.Show(msg, Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             });
         }
 

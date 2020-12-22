@@ -35,7 +35,12 @@ namespace DropZone
             }
             catch (Exception ex)
             {
-                ShowError($"Error while sending files{Environment.NewLine}Detail: {ex.Message}");
+                if (!_canceled)
+                {
+                    ShowError(ex is IOException
+                        ? "Operation was aborted by receiver"
+                        : $"Error while sending files{Environment.NewLine}Detail: {ex.Message}");
+                }
             }
 
             try
@@ -47,13 +52,16 @@ namespace DropZone
                 // ignored
             }
 
-            ThreadUtils.RunOnUiAndWait(() =>
+            if (!_canceled)
             {
-                Status = "Done!";
-                Percent = 100;
-            });
+                ThreadUtils.RunOnUiAndWait(() =>
+                {
+                    Status = "Done!";
+                    Percent = 100;
+                });
 
-            Thread.Sleep(500);
+                Thread.Sleep(300);
+            }
 
             _currentSender = null;
 
@@ -83,6 +91,9 @@ namespace DropZone
                     ThreadUtils.RunOnUiAndWait(() => { Title = $"Sending to {sender.RemoteIdentify}"; });
 
                     sender.Send(sendingFile.File, sendingFile.BaseDir);
+
+                    if (sender.SentBytes < sender.TotalBytes)
+                        throw new Exception("Operation was aborted by receiver");
 
                     ThreadUtils.RunOnUiAndWait(() => Percent = 100);
                 }
