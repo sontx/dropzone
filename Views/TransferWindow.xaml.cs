@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
+using DropZone.ViewModels;
 
-namespace DropZone
+namespace DropZone.Views
 {
     /// <summary>
     /// Interaction logic for SendingWindow.xaml

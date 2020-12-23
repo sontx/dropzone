@@ -1,4 +1,4 @@
-﻿namespace DropZone
+﻿namespace DropZone.Models
 {
     public class SendFileModel
     {

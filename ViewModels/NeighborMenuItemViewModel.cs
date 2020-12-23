@@ -1,11 +1,11 @@
-﻿using DropZone.Protocol;
+﻿using System.Collections.Generic;
+using System.Windows.Input;
+using DropZone.Protocol;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using System.Collections.Generic;
-using System.Windows.Input;
 using Microsoft.Win32;
 
-namespace DropZone
+namespace DropZone.ViewModels
 {
     public class NeighborMenuItemViewModel : ViewModelBase
     {

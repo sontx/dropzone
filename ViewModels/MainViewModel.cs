@@ -1,13 +1,15 @@
-﻿using DropZone.Properties;
-using DropZone.Protocol;
-using GalaSoft.MvvmLight;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DropZone.Models;
+using DropZone.Properties;
+using DropZone.Protocol;
+using DropZone.Views;
+using GalaSoft.MvvmLight;
 
-namespace DropZone
+namespace DropZone.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {

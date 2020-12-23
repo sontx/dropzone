@@ -1,8 +1,8 @@
-﻿using GalaSoft.MvvmLight;
-using System;
+﻿using System;
 using System.Windows;
+using GalaSoft.MvvmLight;
 
-namespace DropZone
+namespace DropZone.ViewModels
 {
     public abstract class TransferViewModel : ViewModelBase
     {

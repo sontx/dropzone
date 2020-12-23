@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace DropZone
+namespace DropZone.Converters
 {
     internal class NotBoolConverter : IValueConverter
     {

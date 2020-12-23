@@ -1,11 +1,12 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using DropZone.ViewModels;
+using Microsoft.Win32;
 
-namespace DropZone
+namespace DropZone.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

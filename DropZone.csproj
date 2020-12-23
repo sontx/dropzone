@@ -56,7 +56,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="FileUtils.cs" />
     <Compile Include="GalaSoft.MvvmLight\Command\RelayCommand.cs" />
     <Compile Include="GalaSoft.MvvmLight\Command\RelayCommandGeneric.cs" />
@@ -86,8 +86,8 @@
     <Compile Include="GalaSoft.MvvmLight\ViewModelBase.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\IDialogService.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\INavigationService.cs" />
-    <Compile Include="NeighborMenuItemViewModel.cs" />
-    <Compile Include="NotBoolConverter.cs" />
+    <Compile Include="ViewModels\NeighborMenuItemViewModel.cs" />
+    <Compile Include="Converters\NotBoolConverter.cs" />
     <Compile Include="Protocol\Constants.cs" />
     <Compile Include="Protocol\FileReceiver.cs" />
     <Compile Include="Protocol\FileSender.cs" />
@@ -101,15 +101,15 @@
     <Compile Include="Protocol\Slaver.cs" />
     <Compile Include="Protocol\TcpServer.cs" />
     <Compile Include="RandomNames.cs" />
-    <Compile Include="ReceivingViewModel.cs" />
-    <Compile Include="SendFileModel.cs" />
-    <Compile Include="SendingViewModel.cs" />
+    <Compile Include="ViewModels\ReceivingViewModel.cs" />
+    <Compile Include="Models\SendFileModel.cs" />
+    <Compile Include="ViewModels\SendingViewModel.cs" />
     <Compile Include="ThreadUtils.cs" />
-    <Compile Include="TransferViewModel.cs" />
-    <Compile Include="TransferWindow.xaml.cs">
+    <Compile Include="ViewModels\TransferViewModel.cs" />
+    <Compile Include="Views\TransferWindow.xaml.cs">
       <DependentUpon>TransferWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="MainWindow.xaml">
+    <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -117,12 +117,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainViewModel.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="TransferWindow.xaml">
+    <Page Include="Views\TransferWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -157,13 +157,14 @@
     <None Include="Resources\bg.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="bg.png" />
+    <Resource Include="Images\bg.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="online.png" />
+    <Resource Include="Images\online.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="settings.png" />
+    <Resource Include="Images\settings.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

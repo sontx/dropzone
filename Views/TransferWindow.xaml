@@ -1,19 +1,20 @@
 ﻿<Window
-    x:Class="DropZone.TransferWindow"
+    x:Class="DropZone.Views.TransferWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:DropZone"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DropZone.ViewModels"
     Title="{Binding Title}"
     Width="450"
     Height="180"
-    d:DataContext="{d:DesignInstance local:SendingViewModel,
+    d:DataContext="{d:DesignInstance viewModels:SendingViewModel,
                                      IsDesignTimeCreatable=True}"
     ResizeMode="CanResizeWithGrip"
     mc:Ignorable="d">
     <Grid>
-        <Image Source="bg.png" />
+        <Image Source="/Images/bg.png" />
         <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

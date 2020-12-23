@@ -1,21 +1,23 @@
 ﻿<Window
-    x:Class="DropZone.MainWindow"
+    x:Class="DropZone.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:DropZone.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:DropZone"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DropZone.ViewModels"
     Title="{Binding Title}"
     Width="400"
     Height="300"
-    d:DataContext="{d:DesignInstance local:MainViewModel,
+    d:DataContext="{d:DesignInstance viewModels:MainViewModel,
                                      IsDesignTimeCreatable=True}"
     ResizeMode="CanResize"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
-        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <local:NotBoolConverter x:Key="NotBoolConverter" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:NotBoolConverter x:Key="NotBoolConverter" />
         <ContextMenu x:Key="NeighborsMenu" ItemsSource="{Binding NeighborMenuItems}">
             <ContextMenu.ItemContainerStyle>
                 <Style TargetType="{x:Type MenuItem}">
@@ -23,7 +25,7 @@
                 </Style>
             </ContextMenu.ItemContainerStyle>
             <ContextMenu.ItemTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:NeighborMenuItemViewModel}" ItemsSource="{Binding MenuItems}">
+                <HierarchicalDataTemplate DataType="{x:Type viewModels:NeighborMenuItemViewModel}" ItemsSource="{Binding MenuItems}">
                     <TextBlock Text="{Binding Header}" />
                 </HierarchicalDataTemplate>
             </ContextMenu.ItemTemplate>
@@ -33,16 +35,13 @@
         <Binding Converter="{StaticResource NotBoolConverter}" Path="IsInitializing" />
     </Window.AllowDrop>
     <Grid>
-        <Image Source="bg.png" />
+        <Image Source="/Images/bg.png" />
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Border
-                Background="Transparent"
-                Cursor="Hand"
-                MouseLeftButtonUp="DropArea_OnMouseLeftButtonUp">
+            <Border Background="Transparent" MouseLeftButtonUp="DropArea_OnMouseLeftButtonUp">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -80,7 +79,7 @@
                                 Width="12"
                                 Height="12"
                                 Margin="0,0,2,0"
-                                Source="online.png" />
+                                Source="/Images/online.png" />
                             <TextBlock Text="{Binding NeighborsSummary}" />
                         </StackPanel>
                     </Hyperlink>
@@ -97,7 +96,7 @@
                             <Image
                                 Width="16"
                                 Height="16"
-                                Source="settings.png" />
+                                Source="/Images/settings.png" />
                         </Button>
                     </StackPanel>
                 </StatusBarItem>

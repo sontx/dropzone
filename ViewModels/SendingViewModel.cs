@@ -1,11 +1,12 @@
-﻿using DropZone.Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using DropZone.Models;
+using DropZone.Protocol;
 
-namespace DropZone
+namespace DropZone.ViewModels
 {
     public class SendingViewModel : TransferViewModel
     {
