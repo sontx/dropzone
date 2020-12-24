@@ -41,7 +41,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Border Background="Transparent" MouseLeftButtonUp="DropArea_OnMouseLeftButtonUp">
+            <Border Background="Transparent" MouseLeftButtonDown="DropArea_OnMouseLeftButtonDown">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />

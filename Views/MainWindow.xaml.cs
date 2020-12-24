@@ -60,8 +60,13 @@ namespace DropZone.Views
             }
         }
 
-        private void DropArea_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void DropArea_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (e.ClickCount != 2)
+            {
+                return;
+            }
+
             if (DataContext is MainViewModel vm && vm.IsInitializing)
             {
                 return;
