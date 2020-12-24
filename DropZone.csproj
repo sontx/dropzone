@@ -92,9 +92,11 @@
     <Compile Include="GalaSoft.MvvmLight\Views\INavigationService.cs" />
     <Compile Include="Protocol\CommandHandler.cs" />
     <Compile Include="TimeUtils.cs" />
+    <Compile Include="ViewModels\AttachmentViewModel.cs" />
     <Compile Include="ViewModels\BubbleViewModel.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\Messages\ReceivedChatMessage.cs" />
+    <Compile Include="ViewModels\Messages\SendAttachmentMessage.cs" />
     <Compile Include="ViewModels\Messages\SendChatMessage.cs" />
     <Compile Include="ViewModels\NeighborMenuItemViewModel.cs" />
     <Compile Include="Converters\NotBoolConverter.cs" />
@@ -192,6 +194,9 @@
   <ItemGroup>
     <Resource Include="Images\attach.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\document.png" />
+    <Resource Include="Images\folder.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

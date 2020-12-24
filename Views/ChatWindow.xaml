@@ -10,7 +10,7 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib"
     xmlns:viewModels="clr-namespace:DropZone.ViewModels"
     Title="{Binding Title}"
-    Width="300"
+    Width="350"
     Height="450"
     WindowStartupLocation="CenterScreen"
     d:DataContext="{d:DesignInstance viewModels:ChatViewModel,
@@ -40,7 +40,8 @@
                             <controls:ConversationBubble
                                 Margin="{Binding IsLeft, Converter={StaticResource IsLeftToMarginConverter}, ConverterParameter='100'}"
                                 BubbleColor="{Binding IsLeft, Converter={StaticResource BoolToBrushConverter}, ConverterParameter='#e4e6eb,#1479fb'}"
-                                Text="{Binding Text}" />
+                                Text="{Binding Text}"
+                                Attachments="{Binding Attachments}"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -62,6 +63,7 @@
                 TextWrapping="Wrap"
                 VerticalScrollBarVisibility="Auto" />
             <Button
+                Click="btnAttachment_OnClick"
                 Grid.Column="1"
                 Margin="4,0,0,0"
                 Background="{x:Null}"

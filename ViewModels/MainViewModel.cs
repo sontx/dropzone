@@ -67,6 +67,7 @@ namespace DropZone.ViewModels
             _station.PropertyChanged += _station_PropertyChanged;
 
             MessengerInstance.Register<SendChatMessage>(this, HandleSendChatMessage);
+            MessengerInstance.Register<SendAttachmentMessage>(this, HandleSendAttachmentMessage);
         }
 
         private async void HandleResolver(Resolver resolver)
@@ -130,7 +131,7 @@ namespace DropZone.ViewModels
             {
                 var neighbors = _station.Neighbors;
                 var remoteAddress = resolver.RemoteAddress;
-                var found = neighbors.Find(item => item.Address == remoteAddress) ?? new Station.Neighbor{Address = remoteAddress};
+                var found = neighbors.Find(item => item.Address == remoteAddress) ?? new Station.Neighbor { Address = remoteAddress };
 
                 ChatWindowManager.Show(found);
                 MessengerInstance.Send(new ReceivedChatMessage(message, found));
@@ -141,6 +142,11 @@ namespace DropZone.ViewModels
         {
             var slaver = Slaver.ConnectToMaster(msg.To.Address);
             await slaver.SendChatAsync(msg.Text);
+        }
+
+        private void HandleSendAttachmentMessage(SendAttachmentMessage msg)
+        {
+            SendFiles(msg.Files, msg.To);
         }
 
         #endregion Chat Message
@@ -208,7 +214,7 @@ namespace DropZone.ViewModels
                     CurrentScannedFile = Path.Combine(shortenDir, name);
                 });
 
-                if (File.GetAttributes(file).HasFlag(FileAttributes.Directory))
+                if (!FileUtils.IsFile(file))
                 {
                     var dir = file;
                     var allFiles = Directory.GetFileSystemEntries(dir, "*", SearchOption.AllDirectories);

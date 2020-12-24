@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 
 namespace DropZone
 {
@@ -14,6 +15,17 @@ namespace DropZone
             var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
             var num = Math.Round(bytes / Math.Pow(1024, place), 1);
             return (Math.Sign(byteCount) * num).ToString(CultureInfo.InvariantCulture) + suf[place];
+        }
+
+        public static bool IsFile(string path)
+        {
+            return !File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+        }
+
+        public static string GetFriendlyFileSize(string path)
+        {
+            var sizeInBytes = new FileInfo(path).Length;
+            return BytesToString(sizeInBytes);
         }
     }
 }

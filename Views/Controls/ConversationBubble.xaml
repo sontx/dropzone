@@ -2,18 +2,60 @@
     x:Class="DropZone.Views.Controls.ConversationBubble"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:DropZone.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:DropZone.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DropZone.ViewModels"
     d:DesignHeight="50"
     d:DesignWidth="200"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
     <Border
         x:Name="border"
         Padding="8"
         VerticalAlignment="Center"
         Background="#FF0D83B9"
         CornerRadius="5">
-        <TextBlock x:Name="textBlock" TextWrapping="Wrap" />
+        <Grid>
+            <TextBlock x:Name="textBlock" TextWrapping="Wrap" />
+            <ItemsControl x:Name="itemsControl" Visibility="Collapsed">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Margin="0,0,0,-5" Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:AttachmentViewModel}">
+                        <StackPanel
+                            MouseLeftButtonDown="attachmentItem_OnMouseLeftButtonDown"
+                            Margin="0,0,0,5"
+                            Orientation="Horizontal"
+                            ToolTip="{Binding Path}">
+                            <Image
+                                Width="16"
+                                Height="16"
+                                Source="/Images/document.png"
+                                Visibility="{Binding IsFolder, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Collapsed,Visible'}" />
+                            <Image
+                                Width="16"
+                                Height="16"
+                                Source="/Images/folder.png"
+                                Visibility="{Binding IsFolder, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
+                            <TextBlock
+                                Margin="2,0,0,0"
+                                FontStyle="Italic"
+                                Text="{Binding Name}" />
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                FontWeight="Bold"
+                                Text="{Binding Size}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
     </Border>
 </UserControl>

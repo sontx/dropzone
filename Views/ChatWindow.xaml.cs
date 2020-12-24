@@ -1,4 +1,5 @@
 ﻿using DropZone.ViewModels;
+using Microsoft.Win32;
 using System;
 using System.Collections.Specialized;
 using System.Windows;
@@ -43,7 +44,7 @@ namespace DropZone.Views
 
             if (DataContext is ChatViewModel vm)
             {
-                vm.Send(txtInput.Text);
+                vm.SendMessage(txtInput.Text);
                 txtInput.Text = string.Empty;
                 e.Handled = true;
             }
@@ -57,6 +58,24 @@ namespace DropZone.Views
             }
 
             base.OnClosed(e);
+        }
+
+        private void btnAttachment_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ChatViewModel vm)
+            {
+                var openFileDialog = new OpenFileDialog
+                {
+                    Multiselect = true,
+                    ValidateNames = false,
+                    CheckFileExists = false,
+                    CheckPathExists = false
+                };
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    vm.SendAttachment(openFileDialog.FileNames);
+                }
+            }
         }
     }
 }

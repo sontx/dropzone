@@ -2,6 +2,8 @@
 using DropZone.ViewModels.Messages;
 using GalaSoft.MvvmLight;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 
 namespace DropZone.ViewModels
 {
@@ -67,7 +69,7 @@ namespace DropZone.ViewModels
             });
         }
 
-        public void Send(string msg)
+        public void SendMessage(string msg)
         {
             if (msg == null)
                 return;
@@ -84,6 +86,30 @@ namespace DropZone.ViewModels
             });
 
             MessengerInstance.Send(new SendChatMessage(msg, Neighbor));
+        }
+
+        public void SendAttachment(string[] files)
+        {
+            if (files == null || files.Length == 0)
+                return;
+
+            Bubbles.Add(new BubbleViewModel
+            {
+                Attachments = files.Select(file =>
+                {
+                    var isFolder = !FileUtils.IsFile(file);
+                    return new AttachmentViewModel
+                    {
+                        Path = file,
+                        IsFolder = isFolder,
+                        Name = Path.GetFileName(file),
+                        Size = isFolder ? string.Empty : FileUtils.GetFriendlyFileSize(file)
+                    };
+                }),
+                IsLeft = false
+            });
+
+            MessengerInstance.Send(new SendAttachmentMessage(files, Neighbor));
         }
     }
 }

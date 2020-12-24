@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using GalaSoft.MvvmLight;
 
 namespace DropZone.ViewModels
@@ -12,5 +8,7 @@ namespace DropZone.ViewModels
         public string Text { get; set; }
 
         public bool IsLeft { get; set; }
+
+        public IEnumerable<AttachmentViewModel> Attachments { get; set; }
     }
 }
