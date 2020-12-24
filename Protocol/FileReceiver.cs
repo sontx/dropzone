@@ -49,6 +49,7 @@ namespace DropZone.Protocol
         public FileReceiver(TcpClient client, string saveDir)
         {
             _client = client;
+            _client.ConfigSocket();
             _saveDir = saveDir;
         }
 

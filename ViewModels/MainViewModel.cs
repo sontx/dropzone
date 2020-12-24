@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using DropZone.Models;
+using DropZone.Properties;
+using DropZone.Protocol;
+using DropZone.ViewModels.Messages;
+using DropZone.Views;
+using GalaSoft.MvvmLight;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DropZone.Models;
-using DropZone.Properties;
-using DropZone.Protocol;
-using DropZone.Views;
-using GalaSoft.MvvmLight;
 
 namespace DropZone.ViewModels
 {
@@ -50,22 +51,41 @@ namespace DropZone.ViewModels
 
         public MainViewModel()
         {
-            if (!IsInDesignMode)
+            if (IsInDesignMode) return;
+
+            _station = new Station(RandomNames.GetRandomName());
+            _master = new Master(Constants.MASTER_PORT)
             {
-                _station = new Station(RandomNames.GetRandomName());
-                _master = new Master(Constants.MASTER_PORT)
+                ResolverHandler = HandleResolver
+            };
+            _master.Start();
+            _station.Start();
+
+            Title = $"Drop Zone [{_station.Name}]";
+
+            UpdateNeighborsSummary();
+            _station.PropertyChanged += _station_PropertyChanged;
+
+            MessengerInstance.Register<SendChatMessage>(this, HandleSendChatMessage);
+        }
+
+        private async void HandleResolver(Resolver resolver)
+        {
+            try
+            {
+                await resolver.HandleNextRequestAsync(new CommandHandler
                 {
-                    ResolverHandler = HandleResolver
-                };
-                _master.Start();
-                _station.Start();
-
-                Title = $"Drop Zone [{_station.Name}]";
-
-                UpdateNeighborsSummary();
-                _station.PropertyChanged += _station_PropertyChanged;
+                    HandleSendFilesAsync = HandleSendFilesAsync,
+                    HandleChatMessageAsync = HandleChatMessageAsync
+                });
+            }
+            finally
+            {
+                resolver.Dispose();
             }
         }
+
+        #region Neighbors Status
 
         private void _station_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -80,7 +100,16 @@ namespace DropZone.ViewModels
             ThreadUtils.RunOnUi(() =>
             {
                 var neighbors = _station.Neighbors;
-                NeighborsSummary = neighbors.Count > 0 ? $"Online neighbors ({neighbors.Count})" : string.Empty;
+
+                if (neighbors.Count == 1)
+                {
+                    NeighborsSummary = $"{neighbors[0]} is online";
+                }
+                else if (neighbors.Count > 1)
+                {
+                    NeighborsSummary = $"{neighbors.Count} is online";
+                }
+
                 HasNeighbors = neighbors.Count > 0;
 
                 NeighborMenuItems.Clear();
@@ -91,27 +120,46 @@ namespace DropZone.ViewModels
             });
         }
 
-        private async void HandleResolver(Resolver resolver)
+        #endregion Neighbors Status
+
+        #region Chat Message
+
+        private Task HandleChatMessageAsync(Resolver resolver, string message)
         {
-            try
+            return Task.Run(() =>
             {
-                var receivingFiles = await resolver.WaitForFilesAsync();
-                var fileSever = new SingleFileServer(Settings.Default.SaveDir);
-                await fileSever.StartAsync();
-                ThreadUtils.RunOnUiAndWait(() =>
-                {
-                    var transferWindow = new TransferWindow();
-                    var receivingViewModel = new ReceivingViewModel(fileSever, receivingFiles) { Title = "Receiver" };
-                    transferWindow.DataContext = receivingViewModel;
-                    transferWindow.Show();
-                    receivingViewModel.Start();
-                });
-                await resolver.Respond(fileSever.Port.ToString());
-            }
-            finally
+                var neighbors = _station.Neighbors;
+                var remoteAddress = resolver.RemoteAddress;
+                var found = neighbors.Find(item => item.Address == remoteAddress) ?? new Station.Neighbor{Address = remoteAddress};
+
+                ChatWindowManager.Show(found);
+                MessengerInstance.Send(new ReceivedChatMessage(message, found));
+            });
+        }
+
+        private async void HandleSendChatMessage(SendChatMessage msg)
+        {
+            var slaver = Slaver.ConnectToMaster(msg.To.Address);
+            await slaver.SendChatAsync(msg.Text);
+        }
+
+        #endregion Chat Message
+
+        #region Send Files
+
+        private async Task HandleSendFilesAsync(Resolver resolver, IEnumerable<string> receivingFiles)
+        {
+            var fileSever = new SingleFileServer(Settings.Default.SaveDir);
+            await fileSever.StartAsync();
+            ThreadUtils.RunOnUiAndWait(() =>
             {
-                resolver.Dispose();
-            }
+                var transferWindow = new TransferWindow();
+                var receivingViewModel = new ReceivingViewModel(fileSever, receivingFiles) { Title = "Receiver" };
+                transferWindow.DataContext = receivingViewModel;
+                transferWindow.Show();
+                receivingViewModel.Start();
+            });
+            await resolver.Respond(fileSever.Port.ToString());
         }
 
         public async void SendFiles(string[] files, Station.Neighbor toNeighbor = null)
@@ -185,7 +233,7 @@ namespace DropZone.ViewModels
 
         private async void RequestSendingFiles(IEnumerable<SendFileModel> files, Station.Neighbor sendTo)
         {
-            var slaver = new Slaver(sendTo.Address, Constants.MASTER_PORT);
+            var slaver = Slaver.ConnectToMaster(sendTo.Address);
             var waitingOnPort = await slaver.RequestSendFilesAsync(files.Select(f => f.File));
 
             if (waitingOnPort > 0)
@@ -200,6 +248,8 @@ namespace DropZone.ViewModels
                 });
             }
         }
+
+        #endregion Send Files
 
         public void Close()
         {

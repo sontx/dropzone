@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Windows.Input;
-using DropZone.Protocol;
+﻿using DropZone.Protocol;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
+using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace DropZone.ViewModels
 {
@@ -43,6 +43,7 @@ namespace DropZone.ViewModels
 
         private void HandleSendMessage()
         {
+            ChatWindowManager.Show(_neighbor, true);
         }
 
         public class SubMenuItem

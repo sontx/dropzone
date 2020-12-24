@@ -14,16 +14,16 @@ namespace DropZone.Protocol
         public Requester(TcpClient client)
         {
             _client = client;
+            _client.ConfigSocket();
+
             _writer = new StreamWriter(_client.GetStream()) { AutoFlush = true };
             _reader = new StreamReader(_client.GetStream());
         }
 
         public async Task SendCommand(string command, string data)
         {
-            await _writer.WriteLineAsync(command);
-
             var dataToSend = string.IsNullOrEmpty(data) ? Constants.COMMAND_DATA_NONE : data;
-            await _writer.WriteLineAsync(dataToSend);
+            await _writer.WriteAsync(command + Environment.NewLine + dataToSend);
         }
 
         public Task<string> WaitForResponseAsync()

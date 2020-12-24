@@ -148,6 +148,12 @@ namespace DropZone.Protocol
             public string Address { get; set; }
             public string Name { get; set; }
             public DateTime LastOnline { get; set; }
+
+            public override string ToString()
+            {
+                var name = string.IsNullOrEmpty(Name) ? "UNKNOWN" : Name;
+                return $"{name} [{Address}]";
+            }
         }
     }
 }

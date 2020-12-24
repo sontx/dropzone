@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace DropZone
@@ -34,6 +35,11 @@ namespace DropZone
             {
                 // ignored
             }
+        }
+
+        public static void ShowDebugMessage(object msg = null)
+        {
+            RunOnUi(() => MessageBox.Show(msg?.ToString()));
         }
     }
 }

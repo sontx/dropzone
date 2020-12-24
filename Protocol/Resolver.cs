@@ -1,19 +1,23 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace DropZone.Protocol
 {
-    internal class Resolver : IDisposable
+    public class Resolver : IDisposable
     {
         private readonly TcpClient _client;
         private readonly StreamReader _reader;
         private readonly StreamWriter _writer;
 
+        public string RemoteAddress => (_client.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString();
+
         public Resolver(TcpClient client)
         {
             _client = client;
+            _client.ConfigSocket();
             _reader = new StreamReader(_client.GetStream());
             _writer = new StreamWriter(_client.GetStream());
         }
@@ -21,7 +25,11 @@ namespace DropZone.Protocol
         public async Task<RequestData> WaitForRequestAsync()
         {
             var command = await _reader.ReadLineAsync();
-            var data = await _reader.ReadLineAsync();
+
+            var buffer = new char[Constants.BUFFER_SIZE_SOCKET];
+            var length = await _reader.ReadAsync(buffer, 0, buffer.Length);
+            var data = new string(buffer, 0, length);
+
             return new RequestData
             {
                 Command = command,

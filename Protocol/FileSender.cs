@@ -30,6 +30,7 @@ namespace DropZone.Protocol
         public void Connect()
         {
             _client.Connect(_host, _port);
+            _client.ConfigSocket();
         }
 
         public void Send(string file, string baseDir)
