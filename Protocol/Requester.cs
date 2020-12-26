@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DropZone.Protocol
@@ -8,7 +9,7 @@ namespace DropZone.Protocol
     internal class Requester : IDisposable
     {
         private readonly TcpClient _client;
-        private readonly StreamWriter _writer;
+        private readonly Stream _stream;
         private readonly StreamReader _reader;
 
         public Requester(TcpClient client)
@@ -16,14 +17,23 @@ namespace DropZone.Protocol
             _client = client;
             _client.ConfigSocket();
 
-            _writer = new StreamWriter(_client.GetStream()) { AutoFlush = true };
+            _stream = _client.GetStream();
             _reader = new StreamReader(_client.GetStream());
         }
 
         public async Task SendCommand(string command, string data)
         {
+            var commandBytes = Encoding.UTF8.GetBytes(command + Environment.NewLine);
+            await _stream.WriteAsync(commandBytes, 0, commandBytes.Length);
+
             var dataToSend = string.IsNullOrEmpty(data) ? Constants.COMMAND_DATA_NONE : data;
-            await _writer.WriteAsync(command + Environment.NewLine + dataToSend);
+            var dataBytes = Encoding.UTF8.GetBytes(dataToSend);
+
+            var lengthBytes = Encoding.UTF8.GetBytes(dataBytes.Length + Environment.NewLine);
+            await _stream.WriteAsync(lengthBytes, 0, lengthBytes.Length);
+
+            await _stream.WriteAsync(dataBytes, 0, dataBytes.Length);
+            await _stream.FlushAsync();
         }
 
         public Task<string> WaitForResponseAsync()
@@ -34,7 +44,7 @@ namespace DropZone.Protocol
         public void Dispose()
         {
             _reader?.Dispose();
-            _writer?.Dispose();
+            _stream?.Dispose();
             _client?.Dispose();
         }
     }

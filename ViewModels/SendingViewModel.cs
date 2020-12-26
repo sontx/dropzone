@@ -76,6 +76,12 @@ namespace DropZone.ViewModels
         {
             for (var i = 0; i < _sendingFiles.Count; i++)
             {
+                lock (this)
+                {
+                    if (_canceled)
+                        break;
+                }
+
                 var sendingFile = _sendingFiles[i];
                 using (var sender = new FileSender(_neighbor.Address, _port, _name))
                 {

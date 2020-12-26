@@ -12,6 +12,11 @@ namespace DropZone
         {
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
             System.Windows.Forms.Application.EnableVisualStyles();
+
+#if DEBUG
+            Debugger.Init();
+#endif
+
             base.OnStartup(e);
         }
 

@@ -65,6 +65,7 @@
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\IsLeftToHorizontalAlignmentConverter.cs" />
     <Compile Include="Converters\IsLeftToMarginConverter.cs" />
+    <Compile Include="Utils\Debugger.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="GalaSoft.MvvmLight\Command\RelayCommand.cs" />
     <Compile Include="GalaSoft.MvvmLight\Command\RelayCommandGeneric.cs" />
@@ -132,6 +133,9 @@
     <Compile Include="Views\Controls\ConversationBubble.xaml.cs">
       <DependentUpon>ConversationBubble.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\LogWindow.xaml.cs">
+      <DependentUpon>LogWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\NotificationWindow.xaml.cs">
       <DependentUpon>NotificationWindow.xaml</DependentUpon>
     </Compile>
@@ -149,6 +153,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\ConversationBubble.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LogWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -73,6 +73,12 @@ namespace DropZone.ViewModels
 
             for (var i = 0; i < _receivingFiles.Count; i++)
             {
+                lock (this)
+                {
+                    if (_canceled)
+                        break;
+                }
+
                 using (var receiver = _fileServer.AcceptReceiver())
                 {
                     _currentReceiver = receiver;

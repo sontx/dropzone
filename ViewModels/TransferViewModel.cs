@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows;
-using DropZone.Utils;
+﻿using DropZone.Utils;
 using GalaSoft.MvvmLight;
+using System;
+using System.Windows;
 
 namespace DropZone.ViewModels
 {
@@ -13,7 +13,7 @@ namespace DropZone.ViewModels
         private string _currentFileName;
         private int _percent;
         private string _status;
-        protected bool _canceled;
+        protected volatile bool _canceled;
 
         public string Title
         {
@@ -41,10 +41,12 @@ namespace DropZone.ViewModels
 
         public void Cancel()
         {
-            if (_canceled)
-                return;
-
-            _canceled = true;
+            lock (this)
+            {
+                if (_canceled)
+                    return;
+                _canceled = true;
+            }
 
             try
             {
