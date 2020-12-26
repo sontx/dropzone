@@ -101,9 +101,13 @@
                             Height="16"
                             Margin="0,0,2,0">
                             <ProgressBar IsIndeterminate="True" Visibility="{Binding IsListingSendingFiles, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
-                            <TextBlock FontWeight="Light" Text="{Binding CurrentScannedFile}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                FontWeight="Light"
+                                Text="{Binding CurrentScannedFile}"
+                                TextTrimming="CharacterEllipsis" />
                         </Grid>
                         <Button
+                            Margin="0,0,2,0"
                             Background="{x:Null}"
                             BorderBrush="{x:Null}"
                             Click="btnSettings_OnClick">
@@ -111,6 +115,15 @@
                                 Width="16"
                                 Height="16"
                                 Source="/Images/settings.png" />
+                        </Button>
+                        <Button
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            Click="btnAbout_OnClick">
+                            <Image
+                                Width="16"
+                                Height="16"
+                                Source="/Images/about.png" />
                         </Button>
                     </StackPanel>
                 </StatusBarItem>

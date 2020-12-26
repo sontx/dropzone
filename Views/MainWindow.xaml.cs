@@ -115,5 +115,11 @@ namespace DropZone.Views
             var settingsWindow = new SettingsWindow {Owner = this};
             settingsWindow.ShowDialog();
         }
+
+        private void btnAbout_OnClick(object sender, RoutedEventArgs e)
+        {
+            var aboutWindow = new AboutWindow{Owner = this};
+            aboutWindow.ShowDialog();
+        }
     }
 }
