@@ -1,10 +1,10 @@
-﻿using System;
+﻿using DropZone.ViewModels;
+using Microsoft.Win32;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using DropZone.ViewModels;
-using Microsoft.Win32;
 
 namespace DropZone.Views
 {
@@ -81,10 +81,31 @@ namespace DropZone.Views
 
         private void NeighborsLink_OnClick(object sender, RoutedEventArgs e)
         {
-            var cm = FindResource("NeighborsMenu") as ContextMenu;
-            cm.PlacementTarget = sender as UIElement;
-            cm.DataContext = DataContext;
-            cm.IsOpen = true;
+            if (DataContext is MainViewModel vm && vm.NeighborMenuItems.Count > 0)
+            {
+                if (vm.NeighborMenuItems.Count == 1)
+                {
+                    var items = vm.NeighborMenuItems[0].MenuItems;
+                    var cm = new ContextMenu();
+                    foreach (var item in items)
+                    {
+                        cm.Items.Add(new MenuItem
+                        {
+                            Header = item.Header,
+                            Command = item.Command
+                        });
+                    }
+                    cm.PlacementTarget = sender as UIElement;
+                    cm.IsOpen = true;
+                }
+                else
+                {
+                    var cm = FindResource("NeighborsMenu") as ContextMenu;
+                    cm.PlacementTarget = sender as UIElement;
+                    cm.DataContext = vm;
+                    cm.IsOpen = true;
+                }
+            }
         }
     }
 }

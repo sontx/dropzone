@@ -23,7 +23,7 @@ namespace DropZone.ViewModels
 
             MenuItems = new List<SubMenuItem> {new SubMenuItem
             {
-                Header = "Send files",
+                Header = "Send Files",
                 Command = new RelayCommand(HandleSendFiles)
             }, new SubMenuItem
             {
