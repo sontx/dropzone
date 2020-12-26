@@ -40,7 +40,7 @@
         </ContextMenu>
     </Window.Resources>
     <Window.AllowDrop>
-        <Binding Converter="{StaticResource NotBoolConverter}" Path="IsInitializing" />
+        <Binding Path="IsReadyToSend" />
     </Window.AllowDrop>
     <Grid>
         <Image Source="/Images/bg.png" />
@@ -59,13 +59,15 @@
                         <TextBlock
                             FontStyle="Italic"
                             TextAlignment="Center"
-                            Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Collapsed,Visible'}">
+                            Visibility="{Binding HasNeighbors, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}">
                             Drop files or folders here
                         </TextBlock>
                         <TextBlock
                             FontStyle="Italic"
-                            Text="{Binding CurrentScannedFile}"
-                            Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
+                            TextAlignment="Center"
+                            Visibility="{Binding HasNeighbors, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Collapsed,Visible'}">
+                            No neighbors are online :(
+                        </TextBlock>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -94,13 +96,17 @@
                 </StatusBarItem>
                 <StatusBarItem Grid.Column="1">
                     <StackPanel Orientation="Horizontal">
-                        <ProgressBar
-                            Width="120"
-                            Height="18"
-                            Margin="0,0,2,0"
-                            IsIndeterminate="True"
-                            Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
-                        <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="btnSettings_OnClick">
+                        <Grid
+                            Width="150"
+                            Height="16"
+                            Margin="0,0,2,0">
+                            <ProgressBar IsIndeterminate="True" Visibility="{Binding IsListingSendingFiles, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
+                            <TextBlock FontWeight="Light" Text="{Binding CurrentScannedFile}" TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                        <Button
+                            Background="{x:Null}"
+                            BorderBrush="{x:Null}"
+                            Click="btnSettings_OnClick">
                             <Image
                                 Width="16"
                                 Height="16"

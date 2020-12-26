@@ -68,7 +68,7 @@ namespace DropZone.Views
                 return;
             }
 
-            if (DataContext is MainViewModel vm && vm.IsInitializing)
+            if (DataContext is MainViewModel vm && !vm.IsReadyToSend)
             {
                 return;
             }

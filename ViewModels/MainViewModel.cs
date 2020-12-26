@@ -1,16 +1,15 @@
-﻿using System;
-using DropZone.Models;
-using DropZone.Properties;
+﻿using DropZone.Models;
 using DropZone.Protocol;
+using DropZone.Utils;
 using DropZone.ViewModels.Messages;
 using DropZone.Views;
 using GalaSoft.MvvmLight;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {
@@ -18,10 +17,11 @@ namespace DropZone.ViewModels
     {
         private readonly Master _master;
         private readonly Station _station;
-        private bool _isInitializing;
+        private bool _isReadyToSend;
         private string _currentScannedFile;
         private string _neighborsSummary;
         private bool _hasNeighbors;
+        private bool _isListingSendingFiles;
 
         public string Title { get; }
 
@@ -39,10 +39,16 @@ namespace DropZone.ViewModels
 
         public ObservableCollection<NeighborMenuItemViewModel> NeighborMenuItems { get; } = new ObservableCollection<NeighborMenuItemViewModel>();
 
-        public bool IsInitializing
+        public bool IsReadyToSend
         {
-            get => _isInitializing;
-            set => Set(ref _isInitializing, value);
+            get => _isReadyToSend;
+            set => Set(ref _isReadyToSend, value);
+        }
+
+        public bool IsListingSendingFiles
+        {
+            get => _isListingSendingFiles;
+            private set => Set(ref _isListingSendingFiles, value);
         }
 
         public string CurrentScannedFile
@@ -114,6 +120,7 @@ namespace DropZone.ViewModels
                 }
 
                 HasNeighbors = neighbors.Count > 0;
+                IsReadyToSend = HasNeighbors;
 
                 NeighborMenuItems.Clear();
                 foreach (var neighbor in neighbors)
@@ -177,13 +184,16 @@ namespace DropZone.ViewModels
                 return;
 
             CurrentScannedFile = string.Empty;
-            IsInitializing = true;
+
+            IsReadyToSend = false;
+            IsListingSendingFiles = true;
 
             await Task.Run(() =>
             {
-                var fileModels = GetSendingModels(files);
+                var fileModels = ListFilesWillBeSent(files);
 
-                IsInitializing = false;
+                IsListingSendingFiles = false;
+                IsReadyToSend = HasNeighbors;
 
                 if (toNeighbor == null)
                 {
@@ -200,28 +210,18 @@ namespace DropZone.ViewModels
             });
         }
 
-        private IEnumerable<SendFileModel> GetSendingModels(string[] files, string baseDir = null)
+        private IEnumerable<SendFileModel> ListFilesWillBeSent(string[] files, string baseDir = null)
         {
             var ret = new LinkedList<SendFileModel>();
             foreach (var file in files)
             {
-                ThreadUtils.RunOnUiAndWait(() =>
-                {
-                    var name = Path.GetFileName(file);
-                    var dir = Path.GetDirectoryName(file);
-                    var ts = dir;
-                    var max = 16;
-                    var shortenDir = ts.Length > max
-                        ? ts.Substring(0, max) + "..." + ts.Substring((ts.Length - max), max)
-                        : ts;
-                    CurrentScannedFile = Path.Combine(shortenDir, name);
-                });
+                CurrentScannedFile = Path.GetFileName(file);
 
                 if (!FileUtils.IsFile(file))
                 {
                     var dir = file;
                     var allFiles = Directory.GetFileSystemEntries(dir, "*", SearchOption.AllDirectories);
-                    var models = GetSendingModels(allFiles, dir);
+                    var models = ListFilesWillBeSent(allFiles, dir);
                     foreach (var model in models)
                     {
                         ret.AddLast(model);
