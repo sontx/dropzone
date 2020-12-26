@@ -10,9 +10,13 @@ namespace DropZone
         [DisplayName("Received Files Location")]
         public string ReceivedFilesDir { get; set; }
 
+        [DisplayName("Show Notification")]
+        public bool IsShowNotification { get; set; }
+
         public AppSettings()
         {
             ReceivedFilesDir = Path.GetFullPath(Constants.DEFAULT_SAVE_DIR);
+            IsShowNotification = true;
         }
     }
 }

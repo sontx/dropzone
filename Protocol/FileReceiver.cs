@@ -10,12 +10,12 @@ namespace DropZone.Protocol
     internal class FileReceiver : ObservableObject, IDisposable
     {
         private readonly TcpClient _client;
-        private readonly string _saveDir;
         private string _fileName;
         private long _totalBytes;
         private string _relativeDir;
         private string _from;
 
+        public string SaveDir { get; }
         public Action AcceptedHeader { get; set; }
 
         public string FileName
@@ -46,11 +46,13 @@ namespace DropZone.Protocol
 
         public string RemoteIdentify => (_client.Client.RemoteEndPoint as IPEndPoint)?.Address?.ToString();
 
+        public string SavedPath { get; private set; }
+
         public FileReceiver(TcpClient client, string saveDir)
         {
             _client = client;
             _client.ConfigSocket();
-            _saveDir = saveDir;
+            SaveDir = saveDir;
         }
 
         public void Receive()
@@ -59,17 +61,17 @@ namespace DropZone.Protocol
             {
                 ReceiveHeader(stream);
                 AcceptedHeader?.Invoke();
-                var file = PrepareSavingFile();
-                ReceiveBody(file, stream);
-                CleanUpIfNeeded(file);
+                SavedPath = PrepareSavingFile();
+                ReceiveBody(SavedPath, stream);
+                CleanUpIfNeeded(SavedPath);
             }
         }
 
         private string PrepareSavingFile()
         {
             var file = string.IsNullOrEmpty(RelativeDir)
-                ? Path.Combine(_saveDir, FileName)
-                : Path.Combine(_saveDir, RelativeDir, FileName);
+                ? Path.Combine(SaveDir, FileName)
+                : Path.Combine(SaveDir, RelativeDir, FileName);
 
             var dir = Path.GetDirectoryName(file);
             if (!Directory.Exists(dir))

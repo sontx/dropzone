@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 
@@ -26,6 +27,14 @@ namespace DropZone.Utils
         {
             var sizeInBytes = new FileInfo(path).Length;
             return BytesToString(sizeInBytes);
+        }
+
+        public static void OpenInExplorer(string path)
+        {
+            var args = IsFile(path)
+                ? $"/select,\"{path}\""
+                : $"\"{path}\"";
+            Process.Start("explorer.exe", args);
         }
     }
 }

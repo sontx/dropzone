@@ -118,8 +118,11 @@
     <Compile Include="Protocol\SingleFileServer.cs" />
     <Compile Include="Protocol\Slaver.cs" />
     <Compile Include="Protocol\TcpServer.cs" />
+    <Compile Include="ViewModels\NotificationViewModel.cs" />
     <Compile Include="ViewModels\ReceivingViewModel.cs" />
     <Compile Include="Models\SendFileModel.cs" />
+    <Compile Include="ViewModels\ReportFileViewModel.cs" />
+    <Compile Include="ViewModels\ReportViewModel.cs" />
     <Compile Include="ViewModels\SendingViewModel.cs" />
     <Compile Include="Utils\ThreadUtils.cs" />
     <Compile Include="ViewModels\TransferViewModel.cs" />
@@ -128,6 +131,12 @@
     </Compile>
     <Compile Include="Views\Controls\ConversationBubble.xaml.cs">
       <DependentUpon>ConversationBubble.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NotificationWindow.xaml.cs">
+      <DependentUpon>NotificationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ReportWindow.xaml.cs">
+      <DependentUpon>ReportWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
@@ -156,6 +165,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\NotificationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ReportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -207,7 +224,9 @@
     <Resource Include="Images\document.png" />
     <Resource Include="Images\folder.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\notification_sound.mp3" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resources\chat.png" />
   </ItemGroup>

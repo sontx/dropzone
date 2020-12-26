@@ -1,7 +1,7 @@
-﻿using System;
+﻿using DropZone.Utils;
 using DropZone.ViewModels;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -97,7 +97,7 @@ namespace DropZone.Views.Controls
             {
                 var element = sender as FrameworkElement;
                 var vm = element.DataContext as AttachmentViewModel;
-                Process.Start("explorer.exe", $"/select,\"{vm.Path}\"");
+                FileUtils.OpenInExplorer(vm.Path);
             }
         }
     }

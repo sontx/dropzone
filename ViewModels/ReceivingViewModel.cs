@@ -1,9 +1,10 @@
-﻿using System;
+﻿using DropZone.Protocol;
+using DropZone.Utils;
+using DropZone.Views;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using DropZone.Protocol;
-using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {
@@ -26,10 +27,11 @@ namespace DropZone.ViewModels
         private void DoInBackground()
         {
             _timer.Change(0, 1000);
+            List<string> savedFiles = null;
 
             try
             {
-                ReceiveFiles();
+                savedFiles = ReceiveFiles();
             }
             catch (Exception ex)
             {
@@ -52,6 +54,9 @@ namespace DropZone.ViewModels
                 {
                     Status = "Done!";
                     Percent = 100;
+
+                    if (savedFiles != null)
+                        OnReceivedSuccessfully(savedFiles);
                 });
 
                 Thread.Sleep(300);
@@ -62,8 +67,10 @@ namespace DropZone.ViewModels
             CloseWindow();
         }
 
-        private void ReceiveFiles()
+        private List<string> ReceiveFiles()
         {
+            var ret = new List<string>(_receivingFiles.Count);
+
             for (var i = 0; i < _receivingFiles.Count; i++)
             {
                 using (var receiver = _fileServer.AcceptReceiver())
@@ -93,8 +100,12 @@ namespace DropZone.ViewModels
                         throw new Exception("Operation was aborted by sender");
 
                     ThreadUtils.RunOnUiAndWait(() => Percent = 100);
+
+                    ret.Add(receiver.SavedPath);
                 }
             }
+
+            return ret;
         }
 
         private void UpdateProgress(object state)
@@ -107,6 +118,19 @@ namespace DropZone.ViewModels
                     Percent = (int)((double)receiver.ReceivedBytes / (double)receiver.TotalBytes * 100D);
                 }
             });
+        }
+
+        private void OnReceivedSuccessfully(List<string> savedFiles)
+        {
+            var settings = SettingsUtils.Get<AppSettings>();
+            var currentReceiver = _currentReceiver;
+
+            if (!settings.IsShowNotification || currentReceiver == null)
+                return;
+
+            var notificationViewModel = new NotificationViewModel(currentReceiver.From, savedFiles, currentReceiver.SaveDir);
+            var notificationWindow = new NotificationWindow { DataContext = notificationViewModel };
+            notificationWindow.Show();
         }
 
         protected override void OnStart()
