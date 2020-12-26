@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Threading;
 
-namespace DropZone
+namespace DropZone.Utils
 {
     internal static class ThreadUtils
     {

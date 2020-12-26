@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace DropZone
+namespace DropZone.Utils
 {
     internal static class ImageUtils
     {

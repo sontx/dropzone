@@ -4,6 +4,7 @@ using GalaSoft.MvvmLight;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {

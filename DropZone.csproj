@@ -65,7 +65,7 @@
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\IsLeftToHorizontalAlignmentConverter.cs" />
     <Compile Include="Converters\IsLeftToMarginConverter.cs" />
-    <Compile Include="FileUtils.cs" />
+    <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="GalaSoft.MvvmLight\Command\RelayCommand.cs" />
     <Compile Include="GalaSoft.MvvmLight\Command\RelayCommandGeneric.cs" />
     <Compile Include="GalaSoft.MvvmLight\Helpers\1DesignerPlatformLibrary.cs" />
@@ -94,10 +94,10 @@
     <Compile Include="GalaSoft.MvvmLight\ViewModelBase.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\IDialogService.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\INavigationService.cs" />
-    <Compile Include="ImageUtils.cs" />
+    <Compile Include="Utils\ImageUtils.cs" />
     <Compile Include="Protocol\CommandHandler.cs" />
-    <Compile Include="SettingsUtils.cs" />
-    <Compile Include="TimeUtils.cs" />
+    <Compile Include="Utils\SettingsUtils.cs" />
+    <Compile Include="Utils\TimeUtils.cs" />
     <Compile Include="ViewModels\AttachmentViewModel.cs" />
     <Compile Include="ViewModels\BubbleViewModel.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
@@ -121,7 +121,7 @@
     <Compile Include="ViewModels\ReceivingViewModel.cs" />
     <Compile Include="Models\SendFileModel.cs" />
     <Compile Include="ViewModels\SendingViewModel.cs" />
-    <Compile Include="ThreadUtils.cs" />
+    <Compile Include="Utils\ThreadUtils.cs" />
     <Compile Include="ViewModels\TransferViewModel.cs" />
     <Compile Include="Views\ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>

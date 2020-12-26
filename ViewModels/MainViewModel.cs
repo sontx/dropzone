@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {

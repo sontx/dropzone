@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using DropZone.Utils;
 using GalaSoft.MvvmLight;
 
 namespace DropZone.ViewModels

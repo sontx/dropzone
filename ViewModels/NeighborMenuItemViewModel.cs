@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using System.Windows.Media;
 using DropZone.Properties;
+using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {

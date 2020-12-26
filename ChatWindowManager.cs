@@ -3,6 +3,7 @@ using DropZone.ViewModels;
 using DropZone.Views;
 using System;
 using System.Collections.Generic;
+using DropZone.Utils;
 
 namespace DropZone
 {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Xml.Serialization;
 
-namespace DropZone
+namespace DropZone.Utils
 {
     internal static class SettingsUtils
     {

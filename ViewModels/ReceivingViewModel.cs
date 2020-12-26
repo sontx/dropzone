@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using DropZone.Protocol;
+using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {

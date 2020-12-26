@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using DropZone.Models;
 using DropZone.Protocol;
+using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {

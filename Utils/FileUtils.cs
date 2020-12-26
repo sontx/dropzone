@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.IO;
 
-namespace DropZone
+namespace DropZone.Utils
 {
     internal static class FileUtils
     {
