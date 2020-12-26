@@ -22,17 +22,5 @@ namespace DropZone.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SaveDir {
-            get {
-                return ((string)(this["SaveDir"]));
-            }
-            set {
-                this["SaveDir"] = value;
-            }
-        }
     }
 }

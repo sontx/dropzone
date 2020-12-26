@@ -83,7 +83,7 @@ namespace DropZone.Views
         {
             if (DataContext is MainViewModel vm && vm.NeighborMenuItems.Count > 0)
             {
-                if (vm.NeighborMenuItems.Count != 1)
+                if (vm.NeighborMenuItems.Count == 1)
                 {
                     var items = vm.NeighborMenuItems[0].MenuItems;
                     var cm = new ContextMenu();
@@ -107,6 +107,12 @@ namespace DropZone.Views
                     cm.IsOpen = true;
                 }
             }
+        }
+
+        private void btnSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            var settingsWindow = new SettingsWindow {Owner = this};
+            settingsWindow.ShowDialog();
         }
     }
 }

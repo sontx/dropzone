@@ -1,7 +1,4 @@
-﻿using DropZone.Properties;
-using DropZone.Protocol;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 
 namespace DropZone
 {
@@ -12,14 +9,15 @@ namespace DropZone
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            InitializeSettings();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+            System.Windows.Forms.Application.EnableVisualStyles();
             base.OnStartup(e);
         }
 
-        private static void InitializeSettings()
+        protected override void OnExit(ExitEventArgs e)
         {
-            if (string.IsNullOrEmpty(Settings.Default.SaveDir))
-                Settings.Default.SaveDir = Path.GetFullPath(Constants.DEFAULT_SAVE_DIR);
+            SettingsUtils.Save();
+            base.OnExit(e);
         }
     }
 }

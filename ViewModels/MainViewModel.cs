@@ -156,7 +156,8 @@ namespace DropZone.ViewModels
 
         private async Task HandleSendFilesAsync(Resolver resolver, IEnumerable<string> receivingFiles)
         {
-            var fileSever = new SingleFileServer(Settings.Default.SaveDir);
+            var settings = SettingsUtils.Get<AppSettings>();
+            var fileSever = new SingleFileServer(settings.ReceivedFilesDir);
             await fileSever.StartAsync();
             ThreadUtils.RunOnUiAndWait(() =>
             {

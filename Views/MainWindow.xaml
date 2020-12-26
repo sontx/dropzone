@@ -100,7 +100,7 @@
                             Margin="0,0,2,0"
                             IsIndeterminate="True"
                             Visibility="{Binding IsInitializing, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
-                        <Button Background="{x:Null}" BorderBrush="{x:Null}">
+                        <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="btnSettings_OnClick">
                             <Image
                                 Width="16"
                                 Height="16"
