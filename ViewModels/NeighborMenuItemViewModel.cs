@@ -12,7 +12,7 @@ namespace DropZone.ViewModels
         private readonly MainViewModel _mainViewModel;
         private readonly Station.Neighbor _neighbor;
 
-        public string Header => $"{_neighbor.Name} [{_neighbor.Address}]";
+        public string Header => _neighbor.ToString();
 
         public List<SubMenuItem> MenuItems { get; }
 

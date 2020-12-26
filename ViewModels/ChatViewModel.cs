@@ -50,7 +50,7 @@ namespace DropZone.ViewModels
         public ChatViewModel(Station.Neighbor neighbor)
         {
             Neighbor = neighbor;
-            Title = Neighbor.ToString();
+            Title = Neighbor.Name;
             MessengerInstance.Register<ReceivedChatMessage>(this, HandleReceivedChatMessage);
         }
 
