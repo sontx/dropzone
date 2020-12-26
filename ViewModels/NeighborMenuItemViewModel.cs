@@ -4,6 +4,8 @@ using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using System.Collections.Generic;
 using System.Windows.Input;
+using System.Windows.Media;
+using DropZone.Properties;
 
 namespace DropZone.ViewModels
 {
@@ -24,11 +26,13 @@ namespace DropZone.ViewModels
             MenuItems = new List<SubMenuItem> {new SubMenuItem
             {
                 Header = "Send Files",
-                Command = new RelayCommand(HandleSendFiles)
+                Command = new RelayCommand(HandleSendFiles),
+                Icon = ImageUtils.ImageSourceFromBitmap(Resources.send_file)
             }, new SubMenuItem
             {
                 Header = "Chat",
-                Command = new RelayCommand(HandleSendMessage)
+                Command = new RelayCommand(HandleSendMessage),
+                Icon = ImageUtils.ImageSourceFromBitmap(Resources.chat)
             }};
         }
 
@@ -50,6 +54,7 @@ namespace DropZone.ViewModels
         {
             public string Header { get; set; }
             public ICommand Command { get; set; }
+            public ImageSource Icon { get; set; }
         }
     }
 }

@@ -90,6 +90,7 @@
     <Compile Include="GalaSoft.MvvmLight\ViewModelBase.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\IDialogService.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\INavigationService.cs" />
+    <Compile Include="ImageUtils.cs" />
     <Compile Include="Protocol\CommandHandler.cs" />
     <Compile Include="TimeUtils.cs" />
     <Compile Include="ViewModels\AttachmentViewModel.cs" />
@@ -179,9 +180,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\bg.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\bg.png" />
   </ItemGroup>
   <ItemGroup>
@@ -196,6 +194,13 @@
   <ItemGroup>
     <Resource Include="Images\document.png" />
     <Resource Include="Images\folder.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\chat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\send_file.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

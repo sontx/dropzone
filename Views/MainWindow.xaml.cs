@@ -83,7 +83,7 @@ namespace DropZone.Views
         {
             if (DataContext is MainViewModel vm && vm.NeighborMenuItems.Count > 0)
             {
-                if (vm.NeighborMenuItems.Count == 1)
+                if (vm.NeighborMenuItems.Count != 1)
                 {
                     var items = vm.NeighborMenuItems[0].MenuItems;
                     var cm = new ContextMenu();
@@ -92,7 +92,8 @@ namespace DropZone.Views
                         cm.Items.Add(new MenuItem
                         {
                             Header = item.Header,
-                            Command = item.Command
+                            Command = item.Command,
+                            Icon = new Image { Source = item.Icon }
                         });
                     }
                     cm.PlacementTarget = sender as UIElement;

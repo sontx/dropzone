@@ -22,6 +22,14 @@
             <ContextMenu.ItemContainerStyle>
                 <Style TargetType="{x:Type MenuItem}">
                     <Setter Property="Command" Value="{Binding Command}" />
+                    <Setter Property="Icon">
+                        <Setter.Value>
+                            <Image
+                                Width="16"
+                                Height="16"
+                                Source="{Binding Icon}" />
+                        </Setter.Value>
+                    </Setter>
                 </Style>
             </ContextMenu.ItemContainerStyle>
             <ContextMenu.ItemTemplate>
