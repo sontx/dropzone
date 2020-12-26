@@ -11,6 +11,8 @@
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     WindowStartupLocation="CenterOwner"
+    WindowStyle="None"
+    Topmost="True"
     mc:Ignorable="d">
     <Grid>
         <Image
@@ -21,10 +23,13 @@
         <Grid Margin="10">
             <TextBlock FontSize="13">
                 This is the author =))<LineBreak />
-                Wanna say thanks, buy him a <Hyperlink RequestNavigate="link_OnRequestNavigate" NavigateUri="https://www.facebook.com/sontx.dev/"> cup of coffee ;)</Hyperlink>
+                Wanna say thanks, buy him a <Hyperlink NavigateUri="https://www.facebook.com/sontx.dev/" RequestNavigate="link_OnRequestNavigate">cup of coffee ;)</Hyperlink>
             </TextBlock>
-            <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                <Hyperlink RequestNavigate="link_OnRequestNavigate" NavigateUri="https://sontx.dev/">sontx.dev</Hyperlink>
+            <TextBlock
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                FontSize="13">
+                <Hyperlink NavigateUri="https://sontx.dev/" RequestNavigate="link_OnRequestNavigate">sontx.dev</Hyperlink>
             </TextBlock>
         </Grid>
     </Grid>
