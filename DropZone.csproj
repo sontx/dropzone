@@ -112,7 +112,6 @@
     <Compile Include="Protocol\SingleFileServer.cs" />
     <Compile Include="Protocol\Slaver.cs" />
     <Compile Include="Protocol\TcpServer.cs" />
-    <Compile Include="RandomNames.cs" />
     <Compile Include="ViewModels\ReceivingViewModel.cs" />
     <Compile Include="Models\SendFileModel.cs" />
     <Compile Include="ViewModels\SendingViewModel.cs" />

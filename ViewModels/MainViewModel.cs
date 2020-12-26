@@ -1,4 +1,5 @@
-﻿using DropZone.Models;
+﻿using System;
+using DropZone.Models;
 using DropZone.Properties;
 using DropZone.Protocol;
 using DropZone.ViewModels.Messages;
@@ -53,7 +54,7 @@ namespace DropZone.ViewModels
         {
             if (IsInDesignMode) return;
 
-            _station = new Station(RandomNames.GetRandomName());
+            _station = new Station(Environment.MachineName);
             _master = new Master(Constants.MASTER_PORT)
             {
                 ResolverHandler = HandleResolver
