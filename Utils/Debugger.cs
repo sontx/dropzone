@@ -79,12 +79,21 @@ namespace DropZone.Utils
                     ThreadUtils.RunOnUiAndWait(() =>
                     {
                         _logWindow = new LogWindow { Owner = Application.Current.MainWindow };
+                        _logWindow.Closed += _logWindow_Closed;
                         _logWindow.Show();
                     });
                 }
             }
 
-            _logWindow.AppendLine(msg);
+            _logWindow?.AppendLine(msg);
+        }
+
+        private static void _logWindow_Closed(object sender, EventArgs e)
+        {
+            lock (_lock)
+            {
+                _logWindow = null;
+            }
         }
     }
 }

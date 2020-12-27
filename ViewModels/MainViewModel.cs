@@ -118,7 +118,7 @@ namespace DropZone.ViewModels
                 }
                 else if (neighbors.Count > 1)
                 {
-                    NeighborsSummary = $"{neighbors.Count} is online";
+                    NeighborsSummary = $"{neighbors.Count} neighbors are online";
                 }
 
                 HasNeighbors = neighbors.Count > 0;
