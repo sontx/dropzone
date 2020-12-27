@@ -63,6 +63,7 @@
     <Compile Include="ChatWindowManager.cs" />
     <Compile Include="Converters\BoolToBrushConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\DebugConverter.cs" />
     <Compile Include="Converters\IsLeftToHorizontalAlignmentConverter.cs" />
     <Compile Include="Converters\IsLeftToMarginConverter.cs" />
     <Compile Include="Utils\Debugger.cs" />

@@ -17,19 +17,19 @@
     mc:Ignorable="d">
     <Window.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:DebugConverter x:Key="DebugConverter" />
         <converters:NotBoolConverter x:Key="NotBoolConverter" />
+        <Image
+            x:Key="MenuIconImage"
+            Width="16"
+            Height="16"
+            x:Shared="false"
+            Source="{Binding Icon}" />
         <ContextMenu x:Key="NeighborsMenu" ItemsSource="{Binding NeighborMenuItems}">
             <ContextMenu.ItemContainerStyle>
                 <Style TargetType="{x:Type MenuItem}">
                     <Setter Property="Command" Value="{Binding Command}" />
-                    <Setter Property="Icon">
-                        <Setter.Value>
-                            <Image
-                                Width="16"
-                                Height="16"
-                                Source="{Binding Icon}" />
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="Icon" Value="{StaticResource MenuIconImage}" />
                 </Style>
             </ContextMenu.ItemContainerStyle>
             <ContextMenu.ItemTemplate>
