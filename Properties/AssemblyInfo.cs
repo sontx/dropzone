@@ -8,9 +8,9 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("DropZone")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Share files quickly in your LAN without any configuration")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("sontx.dev")]
 [assembly: AssemblyProduct("DropZone")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
