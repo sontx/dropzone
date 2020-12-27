@@ -21,7 +21,7 @@
     <ScrollViewer x:Name="scrollViewer">
         <StackPanel
             Cursor="IBeam"
-            MouseLeftButtonUp="content_OnMouseLeftButtonDown"
+            MouseLeftButtonUp="content_OnMouseLeftButtonUp"
             Background="#2d0922"
             FocusManager.FocusedElement="{Binding ElementName=txtInput}"
             Orientation="Vertical">
@@ -52,6 +52,7 @@
                     &gt;
                 </TextBlock>
                 <TextBox
+                    PreviewKeyDown="txtInput_OnPreviewKeyDown"
                     Grid.Column="1"
                     x:Name="txtInput"
                     Background="Transparent"

@@ -1,6 +1,7 @@
 ﻿using DropZone.Utils;
 using DropZone.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -13,6 +14,9 @@ namespace DropZone.Views
     /// </summary>
     public partial class TerminalWindow : Window
     {
+        private List<string> _calledCommands = new List<string>();
+        private int _currentBrowseCommandIndex;
+
         public TerminalWindow()
         {
             InitializeComponent();
@@ -54,6 +58,30 @@ namespace DropZone.Views
                 scrollViewer.ScrollToBottom();
         }
 
+        private void txtInput_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Up)
+            {
+                _currentBrowseCommandIndex--;
+            }
+            else if (e.Key == Key.Down)
+            {
+                _currentBrowseCommandIndex++;
+            }
+            else
+            {
+                return;
+            }
+
+            if (_currentBrowseCommandIndex < 0)
+                _currentBrowseCommandIndex = _calledCommands.Count - 1;
+            else if (_currentBrowseCommandIndex >= _calledCommands.Count)
+                _currentBrowseCommandIndex = 0;
+
+            if (_calledCommands.Count > 0)
+                txtInput.Text = _calledCommands[_currentBrowseCommandIndex];
+        }
+
         private void txtInput_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key != Key.Enter)
@@ -65,9 +93,21 @@ namespace DropZone.Views
                 if (string.IsNullOrEmpty(cmd))
                     return;
 
-                vm.HasOutput = true;
-                ReceivedOutput(cmd);
+                if (cmd.ToLower() == "cls")
+                {
+                    paragraph.Inlines.Clear();
+                    vm.HasOutput = false;
+                }
+                else
+                {
+                    vm.HasOutput = true;
+                    ReceivedOutput(cmd);
+                }
+
                 txtInput.Clear();
+
+                _calledCommands.Add(cmd);
+                _currentBrowseCommandIndex = _calledCommands.Count;
             }
         }
 
@@ -86,7 +126,7 @@ namespace DropZone.Views
             }
         }
 
-        private void content_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void content_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             txtInput.Focus();
         }
