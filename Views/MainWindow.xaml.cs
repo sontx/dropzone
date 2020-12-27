@@ -2,10 +2,12 @@
 using Microsoft.Win32;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using DropZone.Utils;
+using Debugger = DropZone.Utils.Debugger;
 
 namespace DropZone.Views
 {
@@ -48,6 +50,7 @@ namespace DropZone.Views
             if (DataContext is MainViewModel vm)
             {
                 vm.Close();
+                Application.Current.Shutdown();
             }
 
             base.OnClosed(e);

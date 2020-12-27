@@ -66,6 +66,9 @@
     <Compile Include="Converters\DebugConverter.cs" />
     <Compile Include="Converters\IsLeftToHorizontalAlignmentConverter.cs" />
     <Compile Include="Converters\IsLeftToMarginConverter.cs" />
+    <Compile Include="Protocol\RemoteCommandCaller.cs" />
+    <Compile Include="Protocol\RemoteCommandExecutor.cs" />
+    <Compile Include="Protocol\RemoteCommandServer.cs" />
     <Compile Include="Utils\Debugger.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="GalaSoft.MvvmLight\Command\RelayCommand.cs" />
@@ -103,6 +106,10 @@
     <Compile Include="ViewModels\AttachmentViewModel.cs" />
     <Compile Include="ViewModels\BubbleViewModel.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.Chat.cs" />
+    <Compile Include="ViewModels\MainViewModel.Neighbor.cs" />
+    <Compile Include="ViewModels\MainViewModel.RemoteExecutor.cs" />
+    <Compile Include="ViewModels\MainViewModel.SendFiles.cs" />
     <Compile Include="ViewModels\Messages\ReceivedChatMessage.cs" />
     <Compile Include="ViewModels\Messages\SendAttachmentMessage.cs" />
     <Compile Include="ViewModels\Messages\SendChatMessage.cs" />
@@ -123,6 +130,7 @@
     <Compile Include="ViewModels\NotificationViewModel.cs" />
     <Compile Include="ViewModels\ReceivingViewModel.cs" />
     <Compile Include="Models\SendFileModel.cs" />
+    <Compile Include="ViewModels\TerminalViewModel.cs" />
     <Compile Include="ViewModels\ReportFileViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModel.cs" />
     <Compile Include="ViewModels\SendingViewModel.cs" />
@@ -142,6 +150,9 @@
     </Compile>
     <Compile Include="Views\NotificationWindow.xaml.cs">
       <DependentUpon>NotificationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TerminalWindow.xaml.cs">
+      <DependentUpon>TerminalWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ReportWindow.xaml.cs">
       <DependentUpon>ReportWindow.xaml</DependentUpon>
@@ -185,6 +196,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\TerminalWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ReportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -216,6 +231,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="Fonts\UbuntuMono-Regular.ttf" />
+    <Resource Include="Fonts\UbuntuMono-Bold.ttf" />
+    <Resource Include="Fonts\UbuntuMono-BoldItalic.ttf" />
+    <Resource Include="Fonts\UbuntuMono-Italic.ttf" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -255,5 +274,9 @@
   <ItemGroup>
     <Resource Include="Images\author.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\terminal.png" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

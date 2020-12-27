@@ -6,5 +6,6 @@
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">10</system:Double>
+        <FontFamily x:Key="UbuntuMono">pack://application:,,,/Fonts/#Ubuntu Mono</FontFamily>
     </Application.Resources>
 </Application>

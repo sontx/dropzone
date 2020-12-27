@@ -1,12 +1,14 @@
-﻿using DropZone.Protocol;
+﻿using DropZone.Properties;
+using DropZone.Protocol;
+using DropZone.Utils;
+using DropZone.Views;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using DropZone.Properties;
-using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {
@@ -34,6 +36,11 @@ namespace DropZone.ViewModels
                 Header = "Chat",
                 Command = new RelayCommand(HandleSendMessage),
                 Icon = ImageUtils.ImageSourceFromBitmap(Resources.chat)
+            }, new SubMenuItem
+            {
+                Header = "Terminal",
+                Command = new RelayCommand(HandleTerminal),
+                Icon = ImageUtils.ImageSourceFromBitmap(Resources.terminal)
             }};
         }
 
@@ -49,6 +56,14 @@ namespace DropZone.ViewModels
         private void HandleSendMessage()
         {
             ChatWindowManager.Show(_neighbor, true);
+        }
+
+        private void HandleTerminal()
+        {
+            var terminalWindow = new TerminalWindow { Owner = Application.Current.MainWindow };
+            var terminalViewModel = new TerminalViewModel(_neighbor);
+            terminalWindow.DataContext = terminalViewModel;
+            terminalWindow.Show();
         }
 
         public class SubMenuItem

@@ -1,0 +1,70 @@
+﻿<Window
+    x:Class="DropZone.Views.TerminalWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:DropZone.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DropZone.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DropZone.ViewModels"
+    Title="{Binding Title}"
+    Width="800"
+    Height="450"
+    d:DataContext="{d:DesignInstance viewModels:TerminalViewModel,
+                                     IsDesignTimeCreatable=True}"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
+    <ScrollViewer x:Name="scrollViewer">
+        <StackPanel
+            Cursor="IBeam"
+            MouseLeftButtonUp="content_OnMouseLeftButtonDown"
+            Background="#2d0922"
+            FocusManager.FocusedElement="{Binding ElementName=txtInput}"
+            Orientation="Vertical">
+            <RichTextBox
+                Padding="-3,0,0,0"
+                Background="Transparent"
+                BorderThickness="0"
+                Cursor="Arrow"
+                FontSize="16"
+                Foreground="GhostWhite"
+                IsReadOnly="True"
+                Visibility="{Binding HasOutput, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}">
+                <FlowDocument>
+                    <Paragraph x:Name="paragraph" FontFamily="{StaticResource UbuntuMono}" />
+                </FlowDocument>
+            </RichTextBox>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Margin="0,0,2,0"
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource UbuntuMono}"
+                    FontWeight="Bold"
+                    Foreground="GhostWhite">
+                    &gt;
+                </TextBlock>
+                <TextBox
+                    Grid.Column="1"
+                    x:Name="txtInput"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    CaretBrush="WhiteSmoke"
+                    FontFamily="{StaticResource UbuntuMono}"
+                    FontSize="16"
+                    Foreground="GhostWhite"
+                    HorizontalScrollBarVisibility="Hidden"
+                    KeyDown="txtInput_OnKeyDown"
+                    TextWrapping="Wrap"
+                    VerticalScrollBarVisibility="Hidden" />
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
