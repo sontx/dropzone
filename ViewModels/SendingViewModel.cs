@@ -1,11 +1,11 @@
-﻿using System;
+﻿using DropZone.Models;
+using DropZone.Protocol;
+using DropZone.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using DropZone.Models;
-using DropZone.Protocol;
-using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {
@@ -35,15 +35,24 @@ namespace DropZone.ViewModels
 
             try
             {
-                SendFiles();
+                Debugger.Log($"Start sending {_sendingFiles.Count} file(s) to ${_neighbor}");
+                if (SendFiles())
+                {
+                    Debugger.Log($"Sent {_sendingFiles.Count} file(s) successfully");
+                }
             }
             catch (Exception ex)
             {
                 if (!_canceled)
                 {
+                    Debugger.Log($"Sending was aborted: {ex.Message}");
                     ShowError(ex is IOException
                         ? "Operation was aborted by receiver"
                         : $"Error while sending files{Environment.NewLine}Detail: {ex.Message}");
+                }
+                else
+                {
+                    Debugger.Log($"Error while sending file(s): {ex.Message}");
                 }
             }
 
@@ -72,14 +81,14 @@ namespace DropZone.ViewModels
             CloseWindow();
         }
 
-        private void SendFiles()
+        private bool SendFiles()
         {
             for (var i = 0; i < _sendingFiles.Count; i++)
             {
                 lock (this)
                 {
                     if (_canceled)
-                        break;
+                        return false;
                 }
 
                 var sendingFile = _sendingFiles[i];
@@ -100,7 +109,9 @@ namespace DropZone.ViewModels
 
                     ThreadUtils.RunOnUiAndWait(() => { Title = $"Sending to {_neighbor.Name} [{sender.RemoteIdentify}]"; });
 
+                    Debugger.Log($"Sending {sendingFile.File} to {sender.RemoteIdentify}");
                     sender.Send(sendingFile.File, sendingFile.BaseDir);
+                    Debugger.Log($"Sent {sendingFile.File}: " + (sender.SentBytes < sender.TotalBytes ? "FAIL" : "OK"));
 
                     if (sender.SentBytes < sender.TotalBytes)
                         throw new Exception("Operation was aborted by receiver");
@@ -108,6 +119,8 @@ namespace DropZone.ViewModels
                     ThreadUtils.RunOnUiAndWait(() => Percent = 100);
                 }
             }
+
+            return true;
         }
 
         private void UpdateProgress(object state)

@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using DropZone.Utils;
 
 namespace DropZone.Protocol
 {
@@ -38,6 +39,8 @@ namespace DropZone.Protocol
             } while (buffer.Length > totalReadLength);
 
             var data = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+
+            Debugger.Log($"Received command: {command}");
 
             return new RequestData
             {

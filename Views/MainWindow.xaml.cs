@@ -114,6 +114,7 @@ namespace DropZone.Views
         {
             var settingsWindow = new SettingsWindow {Owner = this};
             settingsWindow.ShowDialog();
+            Debugger.IsEnabledLog = SettingsUtils.Get<AppSettings>().IsEnabledDebugger;
         }
 
         private void btnAbout_OnClick(object sender, RoutedEventArgs e)

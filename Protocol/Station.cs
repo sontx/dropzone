@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using DropZone.Utils;
 
 namespace DropZone.Protocol
 {
@@ -52,6 +53,8 @@ namespace DropZone.Protocol
                     var buffer = _client.Receive(ref from);
                     var header = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
                     var parts = header.Split(new[] { '|' }, 2);
+
+                    Debugger.Log("Received broadcast header: " + header);
 
                     if (parts.Length != 2 || parts[0] != HEADER_PREFIX)
                         continue;

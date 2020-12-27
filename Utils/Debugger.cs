@@ -10,6 +10,26 @@ namespace DropZone.Utils
     {
         private static readonly object _lock = new object();
         private static LogWindow _logWindow;
+        private static bool _isEnabledLog;
+
+        public static bool IsEnabledLog
+        {
+            get => _isEnabledLog;
+            set
+            {
+                _isEnabledLog = value;
+                if (_isEnabledLog) return;
+
+                lock (_lock)
+                {
+                    if (_logWindow != null)
+                    {
+                        _logWindow.Close();
+                        _logWindow = null;
+                    }
+                }
+            }
+        }
 
         public static void Init()
         {
@@ -36,8 +56,7 @@ namespace DropZone.Utils
 
         public static void Log(object msg)
         {
-#if DEBUG
-            if (msg == null)
+            if (msg == null || !IsEnabledLog)
                 return;
 
             if (msg is Exception ex)
@@ -49,7 +68,6 @@ namespace DropZone.Utils
             {
                 LogImpl(msg.ToString());
             }
-#endif
         }
 
         private static void LogImpl(string msg)

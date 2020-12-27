@@ -101,6 +101,8 @@ namespace DropZone.ViewModels
             if (e.PropertyName == nameof(Station.Neighbors))
             {
                 UpdateNeighborsSummary();
+
+                Debugger.Log("Online neighbors are updated");
             }
         }
 

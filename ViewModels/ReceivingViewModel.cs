@@ -31,12 +31,20 @@ namespace DropZone.ViewModels
 
             try
             {
+                Debugger.Log($"Start receiving {_receivingFiles.Count} file(s)");
                 savedFiles = ReceiveFiles();
             }
             catch (Exception ex)
             {
                 if (!_canceled)
+                {
+                    Debugger.Log($"Receiving was aborted: {ex.Message}");
                     ShowError($"Error while receiving files{Environment.NewLine}Detail: {ex.Message}");
+                }
+                else
+                {
+                    Debugger.Log($"Error while receiving file(s): {ex.Message}");
+                }
             }
 
             try
@@ -100,7 +108,9 @@ namespace DropZone.ViewModels
                         });
                     };
 
+                    Debugger.Log($"Receiving {receiver.FileName} from {receiver.RemoteIdentify}");
                     receiver.Receive();
+                    Debugger.Log($"Sent {receiver.FileName}: " + (receiver.ReceivedBytes < receiver.TotalBytes ? "FAIL" : "OK"));
 
                     if (receiver.ReceivedBytes < receiver.TotalBytes)
                         throw new Exception("Operation was aborted by sender");
@@ -128,6 +138,8 @@ namespace DropZone.ViewModels
 
         private void OnReceivedSuccessfully(List<string> savedFiles)
         {
+            Debugger.Log($"Sent {_receivingFiles.Count} file(s) successfully");
+
             var settings = SettingsUtils.Get<AppSettings>();
             var currentReceiver = _currentReceiver;
 

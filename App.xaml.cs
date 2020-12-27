@@ -1,5 +1,5 @@
-﻿using System.Windows;
-using DropZone.Utils;
+﻿using DropZone.Utils;
+using System.Windows;
 
 namespace DropZone
 {
@@ -12,10 +12,8 @@ namespace DropZone
         {
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
             System.Windows.Forms.Application.EnableVisualStyles();
-
-#if DEBUG
             Debugger.Init();
-#endif
+            Debugger.IsEnabledLog = SettingsUtils.Get<AppSettings>().IsEnabledDebugger;
 
             base.OnStartup(e);
         }

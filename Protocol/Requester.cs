@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using DropZone.Utils;
 
 namespace DropZone.Protocol
 {
@@ -23,6 +24,8 @@ namespace DropZone.Protocol
 
         public async Task SendCommand(string command, string data)
         {
+            Debugger.Log($"Send command: {command}");
+
             var commandBytes = Encoding.UTF8.GetBytes(command + Environment.NewLine);
             await _stream.WriteAsync(commandBytes, 0, commandBytes.Length);
 

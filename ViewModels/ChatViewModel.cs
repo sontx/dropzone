@@ -60,6 +60,8 @@ namespace DropZone.ViewModels
             if (msg.Sender.Address != Neighbor.Address)
                 return;
 
+            Debugger.Log($"Received chat message \"{msg.Text}\" from {msg.Sender}");
+
             ThreadUtils.RunOnUiAndWait(() =>
             {
                 Bubbles.Add(new BubbleViewModel
@@ -80,6 +82,8 @@ namespace DropZone.ViewModels
             if (string.IsNullOrEmpty(msg))
                 return;
 
+            Debugger.Log($"Send chat message \"{msg}\" to {Neighbor}");
+
             Bubbles.Add(new BubbleViewModel
             {
                 Text = msg,
@@ -93,6 +97,8 @@ namespace DropZone.ViewModels
         {
             if (files == null || files.Length == 0)
                 return;
+
+            Debugger.Log($"Send {files.Length} attachments to {Neighbor}");
 
             Bubbles.Add(new BubbleViewModel
             {
