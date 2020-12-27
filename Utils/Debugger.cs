@@ -36,6 +36,7 @@ namespace DropZone.Utils
 
         public static void Log(object msg)
         {
+#if DEBUG
             if (msg == null)
                 return;
 
@@ -48,6 +49,7 @@ namespace DropZone.Utils
             {
                 LogImpl(msg.ToString());
             }
+#endif
         }
 
         private static void LogImpl(string msg)

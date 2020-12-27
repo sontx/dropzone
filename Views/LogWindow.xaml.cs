@@ -26,6 +26,7 @@ namespace DropZone.Views
             else
             {
                 textBox.AppendText(st + Environment.NewLine);
+                textBox.ScrollToEnd();
             }
         }
     }

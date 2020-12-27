@@ -51,7 +51,8 @@ namespace DropZone.Protocol
                     var from = new IPEndPoint(IPAddress.Any, 0);
                     var buffer = _client.Receive(ref from);
                     var header = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                    var parts = header.Split('|');
+                    var parts = header.Split(new[] { '|' }, 2);
+
                     if (parts.Length != 2 || parts[0] != HEADER_PREFIX)
                         continue;
 
