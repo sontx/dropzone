@@ -5,6 +5,7 @@ using DropZone.ViewModels;
 using DropZone.Views;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace DropZone
 {
@@ -32,7 +33,7 @@ namespace DropZone
                 var chatWindow = GetShowingWindow(withNeighbor);
                 if (chatWindow == null)
                 {
-                    chatWindow = new ChatWindow();
+                    chatWindow = new ChatWindow { Owner = Application.Current.MainWindow };
                     var vm = chatClient != null
                         ? new ChatViewModel(chatClient, withNeighbor)
                         : new ChatViewModel(withNeighbor);
