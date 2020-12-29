@@ -29,30 +29,30 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type viewModels:AttachmentViewModel}">
-                        <StackPanel
-                            MouseLeftButtonDown="attachmentItem_OnMouseLeftButtonDown"
+                        <Grid
                             Margin="0,0,0,5"
-                            Orientation="Horizontal"
+                            MouseLeftButtonDown="attachmentItem_OnMouseLeftButtonDown"
                             ToolTip="{Binding Path}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
                             <Image
                                 Width="16"
                                 Height="16"
-                                Source="/Images/document.png"
-                                Visibility="{Binding IsFolder, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Collapsed,Visible'}" />
-                            <Image
-                                Width="16"
-                                Height="16"
-                                Source="/Images/folder.png"
-                                Visibility="{Binding IsFolder, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible,Collapsed'}" />
-                            <TextBlock
-                                Margin="2,0,0,0"
-                                FontStyle="Italic"
-                                Text="{Binding Name}" />
-                            <TextBlock
-                                Margin="4,0,0,0"
-                                FontWeight="Bold"
-                                Text="{Binding Size}" />
-                        </StackPanel>
+                                Source="/Images/attach.png" />
+                            <StackPanel Grid.Column="1">
+                                <TextBlock
+                                    Margin="2,0,0,0"
+                                    FontStyle="Italic"
+                                    TextWrapping="Wrap">
+                                    <Run Text="{Binding Name}" />
+                                    <Bold>
+                                        <Run Text="{Binding Size}" />
+                                    </Bold>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
