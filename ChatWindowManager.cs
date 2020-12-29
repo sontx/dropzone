@@ -41,6 +41,10 @@ namespace DropZone
                     chatWindow.Show();
                     _showingWindows.Add(vm, chatWindow);
                 }
+                else if (chatClient != null && chatWindow.DataContext is ChatViewModel vm)
+                {
+                    vm.SetChatClient(chatClient);
+                }
 
                 if (active)
                 {

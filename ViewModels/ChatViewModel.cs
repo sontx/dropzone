@@ -12,7 +12,7 @@ namespace DropZone.ViewModels
 {
     internal class ChatViewModel : ViewModelBase
     {
-        private readonly ChatClient _chatClient;
+        private ChatClient _chatClient;
         public Station.Neighbor Neighbor { get; }
 
         public string Title { get; }
@@ -58,12 +58,22 @@ namespace DropZone.ViewModels
 
         public ChatViewModel(ChatClient chatClient, Station.Neighbor neighbor)
         {
-            _chatClient = chatClient ?? new ChatClient(neighbor.Address, Constants.ChatPort);
-            _chatClient.ReceivedMessage = HandleReceivedChatMessage;
-            _chatClient.Start();
-
+            SetChatClient(chatClient ?? new ChatClient(neighbor.Address, Constants.ChatPort));
             Neighbor = neighbor;
             Title = Neighbor.Name;
+        }
+
+        public void SetChatClient(ChatClient chatClient)
+        {
+            if (_chatClient != null)
+            {
+                _chatClient.ReceivedMessage = null;
+                _chatClient.Dispose();
+            }
+
+            _chatClient = chatClient;
+            _chatClient.ReceivedMessage = HandleReceivedChatMessage;
+            _chatClient.Start();
         }
 
         private void HandleReceivedChatMessage(ChatClient.Message msg)
