@@ -3,6 +3,7 @@ using DropZone.Protocol.Chat;
 using DropZone.Utils;
 using DropZone.ViewModels.Messages;
 using GalaSoft.MvvmLight;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -65,17 +66,25 @@ namespace DropZone.ViewModels
             Title = Neighbor.Name;
         }
 
-        private void HandleReceivedChatMessage(string msg)
+        private void HandleReceivedChatMessage(ChatClient.Message msg)
         {
-            Debugger.Log($"Received chat message \"{msg}\" from {Neighbor}");
+            Debugger.Log($"Received chat message \"{msg.Type}\" from {Neighbor}");
 
             ThreadUtils.RunOnUiAndWait(() =>
             {
-                Bubbles.Add(new BubbleViewModel
+                if (msg.Type == ChatClient.MessageType.Text)
                 {
-                    Text = msg,
-                    IsLeft = true
-                });
+                    Bubbles.Add(new BubbleViewModel
+                    {
+                        Text = msg.Data,
+                        IsLeft = true
+                    });
+                }
+                else if (msg.Type == ChatClient.MessageType.Attachment)
+                {
+                    var files = msg.Data.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                    ShowAttachments(files, true, false);
+                }
             });
         }
 
@@ -97,33 +106,36 @@ namespace DropZone.ViewModels
                 IsLeft = false
             });
 
-            await _chatClient.SendAsync(msg);
+            await _chatClient.SendAsync(msg, ChatClient.MessageType.Text);
         }
 
-        public void SendAttachment(string[] files)
+        public async void SendAttachment(string[] files)
         {
             if (files == null || files.Length == 0)
                 return;
 
             Debugger.Log($"Send {files.Length} attachments to {Neighbor}");
 
-            Bubbles.Add(new BubbleViewModel
-            {
-                Attachments = files.Select(file =>
-                {
-                    var isFolder = !FileUtils.IsFile(file);
-                    return new AttachmentViewModel
-                    {
-                        Path = file,
-                        IsFolder = isFolder,
-                        Name = Path.GetFileName(file),
-                        Size = isFolder ? string.Empty : FileUtils.GetFriendlyFileSize(file)
-                    };
-                }),
-                IsLeft = false
-            });
+            ShowAttachments(files, false, true);
 
             MessengerInstance.Send(new SendAttachmentMessage(files, Neighbor));
+
+            await _chatClient.SendAsync(string.Join("|", files.Select(Path.GetFileName)), ChatClient.MessageType.Attachment);
+        }
+
+        private void ShowAttachments(string[] files, bool isFromNeighbor, bool calculateSize)
+        {
+            Bubbles.Add(new BubbleViewModel
+            {
+                Attachments = files.Select(file => new AttachmentViewModel
+                {
+                    Path = file,
+                    IsFolder = false,
+                    Name = Path.GetFileName(file),
+                    Size = calculateSize ? FileUtils.GetFriendlyFileSize(file) : string.Empty
+                }),
+                IsLeft = isFromNeighbor
+            });
         }
 
         public override void Cleanup()

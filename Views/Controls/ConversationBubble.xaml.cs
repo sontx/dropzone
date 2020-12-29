@@ -93,11 +93,10 @@ namespace DropZone.Views.Controls
 
         private void attachmentItem_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 2)
+            if (e.ClickCount == 2 && sender is FrameworkElement element)
             {
-                var element = sender as FrameworkElement;
-                var vm = element.DataContext as AttachmentViewModel;
-                FileUtils.OpenInExplorer(vm.Path);
+                if (element.DataContext is AttachmentViewModel vm)
+                    FileUtils.OpenInExplorer(vm.Path);
             }
         }
     }

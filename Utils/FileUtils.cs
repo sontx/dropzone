@@ -29,8 +29,16 @@ namespace DropZone.Utils
             return BytesToString(sizeInBytes);
         }
 
+        public static bool Exists(string path)
+        {
+            return !string.IsNullOrWhiteSpace(path) && (File.Exists(path) || Directory.Exists(path));
+        }
+
         public static void OpenInExplorer(string path)
         {
+            if (!Exists(path))
+                return;
+
             var args = IsFile(path)
                 ? $"/select,\"{path}\""
                 : $"\"{path}\"";

@@ -7,7 +7,7 @@ namespace DropZone.Protocol.Chat
 {
     internal class ChatClient : ReceivedThreadTcpClient
     {
-        public Action<string> ReceivedMessage { get; set; }
+        public Action<Message> ReceivedMessage { get; set; }
 
         public ChatClient(TcpClient client)
             : base(client)
@@ -27,12 +27,18 @@ namespace DropZone.Protocol.Chat
 
         protected override bool OnReadNextIncomingMessage()
         {
-            var line = ReadLine();
-            if (line == null)
+            var stMessageType = ReadLine();
+            if (stMessageType == null)
                 return false;
 
-            line = WebUtility.UrlDecode(line);
-            ReceivedMessage?.Invoke(line);
+            var messageType = (MessageType)Enum.Parse(typeof(MessageType), stMessageType);
+            var data = ReadLine();
+            var decodedData = WebUtility.UrlDecode(data);
+            ReceivedMessage?.Invoke(new Message
+            {
+                Data = decodedData,
+                Type = messageType
+            });
 
             return true;
         }
@@ -43,15 +49,28 @@ namespace DropZone.Protocol.Chat
             base.Start();
         }
 
-        public async Task SendAsync(string msg)
+        public async Task SendAsync(string msg, MessageType type)
         {
             if (string.IsNullOrWhiteSpace(msg))
                 return;
 
             await ConnectIfNeededAsync();
 
+            await SendLineAsync(type.ToString());
             var encoded = WebUtility.UrlEncode(msg.Trim());
             await SendLineAsync(encoded);
+        }
+
+        public enum MessageType
+        {
+            Text,
+            Attachment
+        }
+
+        public class Message
+        {
+            public string Data { get; set; }
+            public MessageType Type { get; set; }
         }
     }
 }
