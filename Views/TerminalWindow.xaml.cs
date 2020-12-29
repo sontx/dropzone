@@ -1,6 +1,5 @@
 ﻿using DropZone.Utils;
 using DropZone.ViewModels;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
@@ -12,7 +11,7 @@ namespace DropZone.Views
     /// <summary>
     /// Interaction logic for TerminalWindow.xaml
     /// </summary>
-    public partial class TerminalWindow : Window
+    public partial class TerminalWindow : WindowBase
     {
         private List<string> _calledCommands = new List<string>();
         private int _currentBrowseCommandIndex;
@@ -115,15 +114,6 @@ namespace DropZone.Views
         {
             base.OnMouseLeftButtonDown(e);
             txtInput.Focus();
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
-            if (DataContext is TerminalViewModel vm)
-            {
-                vm.Cleanup();
-            }
         }
 
         private void content_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

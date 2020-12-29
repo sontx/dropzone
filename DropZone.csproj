@@ -66,9 +66,17 @@
     <Compile Include="Converters\DebugConverter.cs" />
     <Compile Include="Converters\IsLeftToHorizontalAlignmentConverter.cs" />
     <Compile Include="Converters\IsLeftToMarginConverter.cs" />
-    <Compile Include="Protocol\RemoteCommandCaller.cs" />
-    <Compile Include="Protocol\RemoteCommandExecutor.cs" />
-    <Compile Include="Protocol\RemoteCommandServer.cs" />
+    <Compile Include="Protocol\Chat\ChatClient.cs" />
+    <Compile Include="Protocol\Chat\ChatServer.cs" />
+    <Compile Include="Protocol\File\FileServer.cs" />
+    <Compile Include="Protocol\File\ReceivingSessionHandler.cs" />
+    <Compile Include="Protocol\File\SendingSessionFactory.cs" />
+    <Compile Include="Protocol\ReadWriteTcpClient.cs" />
+    <Compile Include="Protocol\ReceivedThreadTcpClient.cs" />
+    <Compile Include="Protocol\TcpClientBase.cs" />
+    <Compile Include="Protocol\Terminal\RemoteTerminal.cs" />
+    <Compile Include="Protocol\Terminal\RemoteTerminalExecutor.cs" />
+    <Compile Include="Protocol\Terminal\RemoteTerminalServer.cs" />
     <Compile Include="Utils\Debugger.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="GalaSoft.MvvmLight\Command\RelayCommand.cs" />
@@ -100,32 +108,24 @@
     <Compile Include="GalaSoft.MvvmLight\Views\IDialogService.cs" />
     <Compile Include="GalaSoft.MvvmLight\Views\INavigationService.cs" />
     <Compile Include="Utils\ImageUtils.cs" />
-    <Compile Include="Protocol\CommandHandler.cs" />
     <Compile Include="Utils\SettingsUtils.cs" />
+    <Compile Include="Utils\ThreadWrapper.cs" />
     <Compile Include="Utils\TimeUtils.cs" />
     <Compile Include="ViewModels\AttachmentViewModel.cs" />
     <Compile Include="ViewModels\BubbleViewModel.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.Chat.cs" />
-    <Compile Include="ViewModels\MainViewModel.Neighbor.cs" />
-    <Compile Include="ViewModels\MainViewModel.RemoteExecutor.cs" />
+    <Compile Include="ViewModels\MainViewModel.Station.cs" />
+    <Compile Include="ViewModels\MainViewModel.Terminal.cs" />
     <Compile Include="ViewModels\MainViewModel.SendFiles.cs" />
-    <Compile Include="ViewModels\Messages\ReceivedChatMessage.cs" />
     <Compile Include="ViewModels\Messages\SendAttachmentMessage.cs" />
-    <Compile Include="ViewModels\Messages\SendChatMessage.cs" />
     <Compile Include="ViewModels\NeighborMenuItemViewModel.cs" />
     <Compile Include="Converters\NotBoolConverter.cs" />
     <Compile Include="Protocol\Constants.cs" />
-    <Compile Include="Protocol\FileReceiver.cs" />
-    <Compile Include="Protocol\FileSender.cs" />
-    <Compile Include="Protocol\Master.cs" />
-    <Compile Include="Protocol\FileServer.cs" />
+    <Compile Include="Protocol\File\FileReceiver.cs" />
+    <Compile Include="Protocol\File\FileSender.cs" />
     <Compile Include="Protocol\Station.cs" />
-    <Compile Include="Protocol\Requester.cs" />
     <Compile Include="Protocol\Extensions.cs" />
-    <Compile Include="Protocol\Resolver.cs" />
-    <Compile Include="Protocol\SingleFileServer.cs" />
-    <Compile Include="Protocol\Slaver.cs" />
     <Compile Include="Protocol\TcpServer.cs" />
     <Compile Include="ViewModels\NotificationViewModel.cs" />
     <Compile Include="ViewModels\ReceivingViewModel.cs" />
@@ -139,6 +139,7 @@
     <Compile Include="Views\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WindowBase.cs" />
     <Compile Include="Views\ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>

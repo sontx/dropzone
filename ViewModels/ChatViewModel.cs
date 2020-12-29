@@ -1,15 +1,17 @@
 ﻿using DropZone.Protocol;
+using DropZone.Protocol.Chat;
+using DropZone.Utils;
 using DropZone.ViewModels.Messages;
 using GalaSoft.MvvmLight;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using DropZone.Utils;
 
 namespace DropZone.ViewModels
 {
-    public class ChatViewModel : ViewModelBase
+    internal class ChatViewModel : ViewModelBase
     {
+        private readonly ChatClient _chatClient;
         public Station.Neighbor Neighbor { get; }
 
         public string Title { get; }
@@ -49,30 +51,35 @@ namespace DropZone.ViewModels
         }
 
         public ChatViewModel(Station.Neighbor neighbor)
+            : this(null, neighbor)
         {
-            Neighbor = neighbor;
-            Title = Neighbor.Name;
-            MessengerInstance.Register<ReceivedChatMessage>(this, HandleReceivedChatMessage);
         }
 
-        private void HandleReceivedChatMessage(ReceivedChatMessage msg)
+        public ChatViewModel(ChatClient chatClient, Station.Neighbor neighbor)
         {
-            if (msg.Sender.Address != Neighbor.Address)
-                return;
+            _chatClient = chatClient ?? new ChatClient(neighbor.Address, Constants.ChatPort);
+            _chatClient.ReceivedMessage = HandleReceivedChatMessage;
+            _chatClient.Start();
 
-            Debugger.Log($"Received chat message \"{msg.Text}\" from {msg.Sender}");
+            Neighbor = neighbor;
+            Title = Neighbor.Name;
+        }
+
+        private void HandleReceivedChatMessage(string msg)
+        {
+            Debugger.Log($"Received chat message \"{msg}\" from {Neighbor}");
 
             ThreadUtils.RunOnUiAndWait(() =>
             {
                 Bubbles.Add(new BubbleViewModel
                 {
-                    Text = msg.Text,
+                    Text = msg,
                     IsLeft = true
                 });
             });
         }
 
-        public void SendMessage(string msg)
+        public async void SendMessage(string msg)
         {
             if (msg == null)
                 return;
@@ -90,7 +97,7 @@ namespace DropZone.ViewModels
                 IsLeft = false
             });
 
-            MessengerInstance.Send(new SendChatMessage(msg, Neighbor));
+            await _chatClient.SendAsync(msg);
         }
 
         public void SendAttachment(string[] files)
@@ -117,6 +124,12 @@ namespace DropZone.ViewModels
             });
 
             MessengerInstance.Send(new SendAttachmentMessage(files, Neighbor));
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+            _chatClient.Stop();
         }
     }
 }

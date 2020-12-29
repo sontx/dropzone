@@ -1,6 +1,5 @@
 ﻿using DropZone.ViewModels;
 using Microsoft.Win32;
-using System;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Input;
@@ -10,7 +9,7 @@ namespace DropZone.Views
     /// <summary>
     /// Interaction logic for ChatWindow.xaml
     /// </summary>
-    public partial class ChatWindow : Window
+    public partial class ChatWindow : WindowBase
     {
         public ChatWindow()
         {
@@ -48,16 +47,6 @@ namespace DropZone.Views
                 txtInput.Text = string.Empty;
                 e.Handled = true;
             }
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            if (DataContext is ChatViewModel vm)
-            {
-                vm.Cleanup();
-            }
-
-            base.OnClosed(e);
         }
 
         private void btnAttachment_OnClick(object sender, RoutedEventArgs e)

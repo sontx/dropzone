@@ -19,7 +19,7 @@ namespace DropZone.Utils
             {
                 _dispatcher.BeginInvoke(action);
             }
-            catch (Exception ex)
+            catch
             {
                 // ignored
             }
@@ -31,7 +31,7 @@ namespace DropZone.Utils
             {
                 _dispatcher.Invoke(action);
             }
-            catch (Exception ex)
+            catch
             {
                 // ignored
             }

@@ -3,12 +3,13 @@ using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using DropZone.Protocol.Terminal;
 
 namespace DropZone.ViewModels
 {
     internal class TerminalViewModel : ViewModelBase
     {
-        private readonly RemoteCommandCaller _commandCaller;
+        private readonly RemoteTerminal _commandCaller;
         private readonly BlockingCollection<string> _inputCommands = new BlockingCollection<string>();
         private readonly Thread _readCommandThread;
         private bool _init;
@@ -32,7 +33,7 @@ namespace DropZone.ViewModels
 
         public TerminalViewModel(Station.Neighbor neighbor)
         {
-            _commandCaller = new RemoteCommandCaller(neighbor)
+            _commandCaller = new RemoteTerminal(neighbor.Address)
             {
                 ReceivedOutput = HandleReceivedOutput,
                 ReceivedError = HandleReceivedError

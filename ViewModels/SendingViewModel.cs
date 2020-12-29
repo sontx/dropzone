@@ -1,5 +1,6 @@
 ﻿using DropZone.Models;
 using DropZone.Protocol;
+using DropZone.Protocol.File;
 using DropZone.Utils;
 using System;
 using System.Collections.Generic;
@@ -12,38 +13,31 @@ namespace DropZone.ViewModels
     public class SendingViewModel : TransferViewModel
     {
         private readonly Station.Neighbor _neighbor;
-        private readonly int _port;
-        private readonly string _name;
         private readonly List<SendFileModel> _sendingFiles;
-        private readonly Thread _thread;
-        private readonly Timer _timer;
+        private readonly ThreadWrapper _thread;
         private FileSender _currentSender;
 
-        public SendingViewModel(Station.Neighbor neighbor, int port, string name, IEnumerable<SendFileModel> sendingFiles)
+        public SendingViewModel()
         {
-            _neighbor = neighbor;
-            _port = port;
-            _name = name;
-            _sendingFiles = sendingFiles.ToList();
-            _thread = new Thread(DoInBackground) { IsBackground = true };
-            _timer = new Timer(UpdateProgress);
         }
 
-        private void DoInBackground()
+        public SendingViewModel(Station.Neighbor neighbor, IEnumerable<SendFileModel> sendingFiles)
         {
-            _timer.Change(0, 1000);
+            _neighbor = neighbor;
+            _sendingFiles = sendingFiles.ToList();
+            _thread = new ThreadWrapper
+            {
+                DoWork = SendFiles,
+                OnError = OnErrorWhileSendingFiles,
+                OnExit = OnFinishSendingFiles
+            };
+        }
 
-            try
+        private void OnErrorWhileSendingFiles(Exception ex)
+        {
+            lock (this)
             {
-                Debugger.Log($"Start sending {_sendingFiles.Count} file(s) to ${_neighbor}");
-                if (SendFiles())
-                {
-                    Debugger.Log($"Sent {_sendingFiles.Count} file(s) successfully");
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!_canceled)
+                if (!Canceled)
                 {
                     Debugger.Log($"Sending was aborted: {ex.Message}");
                     ShowError(ex is IOException
@@ -55,76 +49,84 @@ namespace DropZone.ViewModels
                     Debugger.Log($"Error while sending file(s): {ex.Message}");
                 }
             }
+        }
 
-            try
-            {
-                _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            }
-            catch
-            {
-                // ignored
-            }
+        private void OnFinishSendingFiles()
+        {
+            StopTimer();
 
-            if (!_canceled)
+            lock (this)
             {
-                ThreadUtils.RunOnUiAndWait(() =>
+                if (!Canceled)
                 {
-                    Status = "Done!";
-                    Percent = 100;
-                });
+                    ThreadUtils.RunOnUiAndWait(() =>
+                    {
+                        Status = "Done!";
+                        Percent = 100;
+                    });
 
-                Thread.Sleep(300);
+                    Thread.Sleep(300);
+                }
             }
 
             _currentSender = null;
 
-            CloseWindow();
+            CloseUi();
         }
 
-        private bool SendFiles()
+        private void SendFiles()
         {
-            for (var i = 0; i < _sendingFiles.Count; i++)
+            Debugger.Log($"Start sending {_sendingFiles.Count} file(s) to ${_neighbor}");
+
+            using (var factory = new SendingSessionFactory(_neighbor.Address, _sendingFiles.Select(file => file.File)))
             {
-                lock (this)
-                {
-                    if (_canceled)
-                        return false;
-                }
+                var session = factory.CreateSessionAsync().Result;
 
-                var sendingFile = _sendingFiles[i];
-                using (var sender = new FileSender(_neighbor.Address, _port, _name))
+                for (var i = 0; i < _sendingFiles.Count; i++)
                 {
-                    _currentSender = sender;
-
-                    var sendingCount = i + 1;
-                    ThreadUtils.RunOnUiAndWait(() =>
+                    lock (this)
                     {
-                        Status = $"Sending {sendingCount}/{_sendingFiles.Count}";
-                        var fileInfo = new FileInfo(sendingFile.File);
-                        CurrentFileName = $"{fileInfo.Name} ({FileUtils.BytesToString(fileInfo.Length)})";
-                        Percent = 0;
-                    });
+                        if (Canceled)
+                            return;
+                    }
 
-                    sender.Connect();
+                    var sendingFile = _sendingFiles[i];
 
-                    ThreadUtils.RunOnUiAndWait(() => { Title = $"Sending to {_neighbor.Name} [{sender.RemoteIdentify}]"; });
+                    using (var sender = session.CreateSender())
+                    {
+                        _currentSender = sender;
 
-                    Debugger.Log($"Sending {sendingFile.File} to {sender.RemoteIdentify}");
-                    sender.Send(sendingFile.File, sendingFile.BaseDir);
-                    Debugger.Log($"Sent {sendingFile.File}: " + (sender.SentBytes < sender.TotalBytes ? "FAIL" : "OK"));
+                        var sendingCount = i + 1;
+                        ThreadUtils.RunOnUiAndWait(() =>
+                        {
+                            Status = $"Sending {sendingCount}/{_sendingFiles.Count}";
+                            var fileInfo = new FileInfo(sendingFile.File);
+                            CurrentFileName = $"{fileInfo.Name} ({FileUtils.BytesToString(fileInfo.Length)})";
+                            Percent = 0;
+                        });
 
-                    if (sender.SentBytes < sender.TotalBytes)
-                        throw new Exception("Operation was aborted by receiver");
+                        sender.Connect();
 
-                    ThreadUtils.RunOnUiAndWait(() => Percent = 100);
+                        ThreadUtils.RunOnUiAndWait(() => { Title = $"Sending to {_neighbor.Name} [{sender.RemoteAddress}]"; });
+
+                        Debugger.Log($"Sending {sendingFile.File} to {sender.RemoteAddress}");
+                        sender.Send(sendingFile.File, sendingFile.BaseDir);
+                        Debugger.Log($"Sent {sendingFile.File}: " + (sender.SentBytes < sender.TotalBytes ? "FAIL" : "OK"));
+
+                        if (sender.SentBytes < sender.TotalBytes)
+                            throw new Exception("Operation was aborted by receiver");
+
+                        ThreadUtils.RunOnUiAndWait(() => Percent = 100);
+                    }
                 }
             }
 
-            return true;
+            Debugger.Log($"Sent {_sendingFiles.Count} file(s) successfully");
         }
 
-        private void UpdateProgress(object state)
+        protected override void OnTimerCallback(object state)
         {
+            base.OnTimerCallback(state);
             ThreadUtils.RunOnUi(() =>
             {
                 var sender = _currentSender;
@@ -144,12 +146,12 @@ namespace DropZone.ViewModels
         {
             var currentSender = _currentSender;
             currentSender?.Dispose();
-            _timer.Dispose();
         }
 
         protected override void OnStart()
         {
             _thread.Start();
+            StartTimer(1000);
         }
     }
 }

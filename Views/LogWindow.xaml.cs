@@ -7,7 +7,7 @@ namespace DropZone.Views
     /// <summary>
     /// Interaction logic for LogWindow.xaml
     /// </summary>
-    public partial class LogWindow : Window
+    public partial class LogWindow : WindowBase
     {
         private readonly int _mainThreadId;
 

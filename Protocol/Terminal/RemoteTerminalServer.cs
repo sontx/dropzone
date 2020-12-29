@@ -2,14 +2,14 @@
 using System.IO;
 using System.Net.Sockets;
 
-namespace DropZone.Protocol
+namespace DropZone.Protocol.Terminal
 {
-    internal class RemoteCommandServer : TcpServer
+    internal class RemoteTerminalServer : TcpServer
     {
-        public Action<RemoteCommandExecutor> ExecutorHandler { get; set; }
+        public Action<RemoteTerminalExecutor> ExecutorHandler { get; set; }
 
-        public RemoteCommandServer()
-            : base(Constants.REMOTE_COMMAND_PORT)
+        public RemoteTerminalServer()
+            : base(Constants.RemoteCommandPort)
         {
         }
 
@@ -19,7 +19,7 @@ namespace DropZone.Protocol
             var command = await reader.ReadLineAsync();
             reader.DiscardBufferedData();
 
-            var executor = new RemoteCommandExecutor(client, command);
+            var executor = new RemoteTerminalExecutor(client, command);
             ExecutorHandler?.Invoke(executor);
         }
     }

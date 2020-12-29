@@ -1,4 +1,5 @@
 ﻿using DropZone.Protocol;
+using DropZone.Protocol.File;
 using DropZone.Utils;
 using DropZone.Views;
 using System;
@@ -10,33 +11,29 @@ namespace DropZone.ViewModels
 {
     internal class ReceivingViewModel : TransferViewModel
     {
-        private readonly SingleFileServer _fileServer;
-        private readonly List<string> _receivingFiles;
-        private readonly Thread _thread;
-        private readonly Timer _timer;
+        private readonly ReceivingSessionHandler.Session _session;
+        private readonly Station _station;
+        private readonly ThreadWrapper _thread;
+        private List<string> _receivedFiles;
         private FileReceiver _currentReceiver;
 
-        public ReceivingViewModel(SingleFileServer fileServer, IEnumerable<string> receivingFiles)
+        public ReceivingViewModel(ReceivingSessionHandler.Session session, Station station)
         {
-            _fileServer = fileServer;
-            _receivingFiles = receivingFiles.ToList();
-            _thread = new Thread(DoInBackground) { IsBackground = true };
-            _timer = new Timer(UpdateProgress);
+            _session = session;
+            _station = station;
+            _thread = new ThreadWrapper
+            {
+                DoWork = ReceiveFiles,
+                OnError = OnErrorWhileReceivingFiles,
+                OnExit = OnFinishReceivingFiles
+            };
         }
 
-        private void DoInBackground()
+        private void OnErrorWhileReceivingFiles(Exception ex)
         {
-            _timer.Change(0, 1000);
-            List<string> savedFiles = null;
-
-            try
+            lock (this)
             {
-                Debugger.Log($"Start receiving {_receivingFiles.Count} file(s)");
-                savedFiles = ReceiveFiles();
-            }
-            catch (Exception ex)
-            {
-                if (!_canceled)
+                if (!Canceled)
                 {
                     Debugger.Log($"Receiving was aborted: {ex.Message}");
                     ShowError($"Error while receiving files{Environment.NewLine}Detail: {ex.Message}");
@@ -46,48 +43,48 @@ namespace DropZone.ViewModels
                     Debugger.Log($"Error while receiving file(s): {ex.Message}");
                 }
             }
+        }
 
-            try
-            {
-                _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            }
-            catch
-            {
-                // ignored
-            }
+        private void OnFinishReceivingFiles()
+        {
+            StopTimer();
 
-            if (!_canceled)
+            lock (this)
             {
-                ThreadUtils.RunOnUiAndWait(() =>
+                if (!Canceled)
                 {
-                    Status = "Done!";
-                    Percent = 100;
+                    ThreadUtils.RunOnUiAndWait(() =>
+                    {
+                        Status = "Done!";
+                        Percent = 100;
 
-                    if (savedFiles != null)
-                        OnReceivedSuccessfully(savedFiles);
-                });
+                        if (_receivedFiles != null && _receivedFiles.Count == _session.WillReceiveFiles.Count)
+                            OnReceivedSuccessfully(_receivedFiles);
+                    });
 
-                Thread.Sleep(300);
+                    Thread.Sleep(300);
+                }
             }
 
             _currentReceiver = null;
 
-            CloseWindow();
+            CloseUi();
         }
 
-        private List<string> ReceiveFiles()
+        private void ReceiveFiles()
         {
-            var ret = new List<string>(_receivingFiles.Count);
+            var receivingFiles = _session.WillReceiveFiles;
+            _receivedFiles = new List<string>(receivingFiles.Count);
 
-            for (var i = 0; i < _receivingFiles.Count; i++)
+            for (var i = 0; i < receivingFiles.Count; i++)
             {
                 lock (this)
                 {
-                    if (_canceled)
+                    if (Canceled)
                         break;
                 }
 
-                using (var receiver = _fileServer.AcceptReceiver())
+                using (var receiver = _session.AcceptReceiverAsync().Result)
                 {
                     _currentReceiver = receiver;
 
@@ -95,7 +92,7 @@ namespace DropZone.ViewModels
                     ThreadUtils.RunOnUiAndWait(() =>
                     {
                         Title = "Receiver";
-                        Status = $"Receiving {receivingCount}/{_receivingFiles.Count}";
+                        Status = $"Receiving {receivingCount}/{receivingFiles.Count}";
                         Percent = 0;
                     });
 
@@ -103,12 +100,13 @@ namespace DropZone.ViewModels
                     {
                         ThreadUtils.RunOnUiAndWait(() =>
                         {
-                            Title = $"Receiving from {receiver.From} [{receiver.RemoteIdentify}]";
+                            var neighbor = _station.GetNeighbor(receiver.RemoteAddress);
+                            Title = $"Receiving from {neighbor}";
                             CurrentFileName = $"{receiver.FileName} ({FileUtils.BytesToString(receiver.TotalBytes)})";
                         });
                     };
 
-                    Debugger.Log($"Receiving {receiver.FileName} from {receiver.RemoteIdentify}");
+                    Debugger.Log($"Receiving {receiver.FileName} from {receiver.RemoteAddress}");
                     receiver.Receive();
                     Debugger.Log($"Sent {receiver.FileName}: " + (receiver.ReceivedBytes < receiver.TotalBytes ? "FAIL" : "OK"));
 
@@ -117,15 +115,14 @@ namespace DropZone.ViewModels
 
                     ThreadUtils.RunOnUiAndWait(() => Percent = 100);
 
-                    ret.Add(receiver.SavedPath);
+                    _receivedFiles.Add(receiver.SavedPath);
                 }
             }
-
-            return ret;
         }
 
-        private void UpdateProgress(object state)
+        protected override void OnTimerCallback(object state)
         {
+            base.OnTimerCallback(state);
             ThreadUtils.RunOnUi(() =>
             {
                 var receiver = _currentReceiver;
@@ -138,7 +135,8 @@ namespace DropZone.ViewModels
 
         private void OnReceivedSuccessfully(List<string> savedFiles)
         {
-            Debugger.Log($"Sent {_receivingFiles.Count} file(s) successfully");
+            var receivingFiles = _session.WillReceiveFiles;
+            Debugger.Log($"Sent {receivingFiles.Count} file(s) successfully");
 
             var settings = SettingsUtils.Get<AppSettings>();
             var currentReceiver = _currentReceiver;
@@ -146,7 +144,9 @@ namespace DropZone.ViewModels
             if (!settings.IsShowNotification || currentReceiver == null)
                 return;
 
-            var notificationViewModel = new NotificationViewModel(currentReceiver.From, savedFiles, currentReceiver.SaveDir);
+            var neighbor = _station.GetNeighbor(currentReceiver.RemoteAddress);
+
+            var notificationViewModel = new NotificationViewModel(neighbor.ToString(), savedFiles, currentReceiver.SaveDir);
             var notificationWindow = new NotificationWindow { DataContext = notificationViewModel };
             notificationWindow.Show();
         }
@@ -154,6 +154,7 @@ namespace DropZone.ViewModels
         protected override void OnStart()
         {
             _thread.Start();
+            StartTimer(1000);
         }
 
         protected override void OnCancel()
@@ -163,10 +164,9 @@ namespace DropZone.ViewModels
 
         protected override void OnCleanUp()
         {
-            _timer.Dispose();
             var currentReceiver = _currentReceiver;
             currentReceiver?.Dispose();
-            _fileServer.Dispose();
+            _session.Dispose();
         }
     }
 }

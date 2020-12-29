@@ -18,7 +18,7 @@ namespace DropZone
 
         public AppSettings()
         {
-            ReceivedFilesDir = Path.GetFullPath(Constants.DEFAULT_SAVE_DIR);
+            ReceivedFilesDir = Path.GetFullPath(Constants.DefaultSaveDir);
             IsShowNotification = true;
         }
     }

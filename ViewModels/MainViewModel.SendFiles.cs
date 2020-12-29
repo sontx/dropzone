@@ -1,19 +1,24 @@
 ﻿using DropZone.Models;
 using DropZone.Protocol;
+using DropZone.Protocol.File;
 using DropZone.Utils;
 using DropZone.Views;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DropZone.ViewModels
 {
     public partial class MainViewModel
     {
+        private FileServer _fileServer;
         private bool _isReadyToSend;
         private string _currentScannedFile;
         private bool _isListingSendingFiles;
+        private int _processingTaskCount;
+
+        public int ProcessingTaskCount => _processingTaskCount;
 
         public bool IsReadyToSend
         {
@@ -33,20 +38,38 @@ namespace DropZone.ViewModels
             set => Set(ref _currentScannedFile, value);
         }
 
-        private async Task HandleSendFilesAsync(Resolver resolver, IEnumerable<string> receivingFiles)
+        private void InitializeSendFiles()
         {
-            var settings = SettingsUtils.Get<AppSettings>();
-            var fileSever = new SingleFileServer(settings.ReceivedFilesDir);
-            await fileSever.StartAsync();
+            _fileServer = new FileServer
+            {
+                OnSessionHandler = HandleReceivingSessionHandler
+            };
+            _fileServer.Start();
+        }
+
+        private void CloseSendFiles()
+        {
+            _fileServer.Stop();
+        }
+
+        private async void HandleReceivingSessionHandler(ReceivingSessionHandler sessionHandler)
+        {
+            var session = await sessionHandler.AcceptSessionAsync();
             ThreadUtils.RunOnUiAndWait(() =>
             {
+                var settings = SettingsUtils.Get<AppSettings>();
+                session.SaveDir = settings.ReceivedFilesDir;
                 var transferWindow = new TransferWindow();
-                var receivingViewModel = new ReceivingViewModel(fileSever, receivingFiles) { Title = "Receiver" };
+                var receivingViewModel = new ReceivingViewModel(session, _station) { Title = "Receiver" };
+
                 transferWindow.DataContext = receivingViewModel;
+                transferWindow.Closed += TransferWindow_Closed;
                 transferWindow.Show();
+
+                Interlocked.Increment(ref _processingTaskCount);
                 receivingViewModel.Start();
+
             });
-            await resolver.Respond(fileSever.Port.ToString());
         }
 
         public async void SendFiles(string[] files, Station.Neighbor toNeighbor = null)
@@ -111,23 +134,28 @@ namespace DropZone.ViewModels
             return ret;
         }
 
-        private async void RequestSendingFiles(IEnumerable<SendFileModel> files, Station.Neighbor sendTo)
+        private void RequestSendingFiles(IEnumerable<SendFileModel> files, Station.Neighbor sendTo)
         {
-            var slaver = Slaver.ConnectToMaster(sendTo.Address);
-            var waitingOnPort = await slaver.RequestSendFilesAsync(files.Select(f => f.File));
-
-            if (waitingOnPort > 0)
+            ThreadUtils.RunOnUi(() =>
             {
-                ThreadUtils.RunOnUi(() =>
+                var transferWindow = new TransferWindow();
+                var sendingViewModel = new SendingViewModel(sendTo, files)
                 {
-                    var transferWindow = new TransferWindow();
-                    var sendingViewModel = new SendingViewModel(sendTo, waitingOnPort, _station.Name, files)
-                    { Title = "Sender" };
-                    transferWindow.DataContext = sendingViewModel;
-                    transferWindow.Show();
-                    sendingViewModel.Start();
-                });
-            }
+                    Title = "Sender"
+                };
+
+                transferWindow.Closed += TransferWindow_Closed;
+                transferWindow.DataContext = sendingViewModel;
+                transferWindow.Show();
+
+                Interlocked.Increment(ref _processingTaskCount);
+                sendingViewModel.Start();
+            });
+        }
+
+        private void TransferWindow_Closed(object sender, System.EventArgs e)
+        {
+            Interlocked.Decrement(ref _processingTaskCount);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace DropZone.Views
     /// <summary>
     /// Interaction logic for NotificationWindow.xaml
     /// </summary>
-    public partial class NotificationWindow : Window
+    public partial class NotificationWindow : WindowBase
     {
         public NotificationWindow()
         {

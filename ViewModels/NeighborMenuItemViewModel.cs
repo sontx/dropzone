@@ -55,7 +55,7 @@ namespace DropZone.ViewModels
 
         private void HandleSendMessage()
         {
-            ChatWindowManager.Show(_neighbor, true);
+            ChatWindowManager.Show(_neighbor, null, true);
         }
 
         private void HandleTerminal()

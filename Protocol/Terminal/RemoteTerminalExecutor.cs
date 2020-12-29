@@ -1,72 +1,66 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace DropZone.Protocol
+namespace DropZone.Protocol.Terminal
 {
-    public class RemoteCommandExecutor
+    public class RemoteTerminalExecutor : ReceivedThreadTcpClient
     {
         public event EventHandler Closed;
 
-        private readonly TcpClient _client;
         private readonly string _command;
-        private readonly Thread _inputThread;
         private readonly Process _process;
-        private readonly StreamWriter _writer;
-        private readonly StreamReader _reader;
 
-        public RemoteCommandExecutor(TcpClient client, string command)
+        public RemoteTerminalExecutor(TcpClient client, string command)
+            : base(client)
         {
-            _client = client;
             _command = command;
-            _inputThread = new Thread(WaitForRemoteInput) { IsBackground = true };
             _process = new Process();
-            _writer = new StreamWriter(_client.GetStream()) { AutoFlush = true };
-            _reader = new StreamReader(_client.GetStream());
         }
 
-        private void WaitForRemoteInput()
+        protected override bool OnReadNextIncomingMessage()
         {
+            var line = ReadLine();
+            if (line == null)
+                return false;
+
+            _process.StandardInput.WriteLine(line);
+            _process.StandardInput.Flush();
+
+            return true;
+        }
+
+        protected override void OnErrorWhileWaitingIncomingMessage(Exception ex)
+        {
+            base.OnErrorWhileWaitingIncomingMessage(ex);
+
+            if (ex is InvalidOperationException)
+            {
+                SendError(ex.Message);
+            }
+
+            Closed?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected override void OnExitIncomingMessageLoop()
+        {
+            base.OnExitIncomingMessageLoop();
+
             try
             {
-                while (true)
-                {
-                    var line = _reader.ReadLine();
-                    if (line == null)
-                        break;
-                    _process.StandardInput.WriteLine(line);
-                    _process.StandardInput.Flush();
-                }
+                _process.StandardInput.Close();
+                _process.CloseMainWindow();
+                _process.Close();
+                _process?.Kill();
             }
-            catch (Exception ex)
+            catch
             {
-                if (ex is InvalidOperationException)
-                {
-                    SendError(ex.Message);
-                }
-
-                Closed?.Invoke(this, EventArgs.Empty);
-            }
-            finally
-            {
-                try
-                {
-                    _process.StandardInput.Close();
-                    _process.CloseMainWindow();
-                    _process.Close();
-                    _process?.Kill();
-                }
-                catch
-                {
-                    // ignored
-                }
+                // ignored
             }
         }
 
-        public void Start()
+        public override void Start()
         {
             var startInfo = new ProcessStartInfo("cmd", $"/K {_command}")
             {
@@ -91,12 +85,12 @@ namespace DropZone.Protocol
                 return;
             }
 
-            _inputThread.Start();
+            base.Start();
         }
 
         private async void _process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            await SendBackToCaller($"{Constants.REMOTE_COMMAND_OUTPUT_PREFIX}:{e.Data}");
+            await SendBackToCaller($"{Constants.RemoteCommandOutputPrefix}:{e.Data}");
         }
 
         private void _process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
@@ -106,7 +100,7 @@ namespace DropZone.Protocol
 
         private async void SendError(string err)
         {
-            await SendBackToCaller($"{Constants.REMOTE_COMMAND_ERROR_PREFIX}:{err}");
+            await SendBackToCaller($"{Constants.RemoteCommandErrorPrefix}:{err}");
         }
 
         private Task SendBackToCaller(string msg)
@@ -117,7 +111,7 @@ namespace DropZone.Protocol
                 {
                     try
                     {
-                        _writer?.WriteLine(msg);
+                        SendLine(msg);
                     }
                     catch
                     {
@@ -127,15 +121,12 @@ namespace DropZone.Protocol
             });
         }
 
-        public void Stop()
+        public override void Stop()
         {
             _process.OutputDataReceived -= _process_OutputDataReceived;
             _process.ErrorDataReceived -= _process_ErrorDataReceived;
 
-            _reader.Dispose();
-            _writer.Dispose();
-            _process.Dispose();
-            _client.Dispose();
+            base.Stop();
         }
     }
 }

@@ -1,27 +1,20 @@
-﻿using System;
+﻿using DropZone.ViewModels;
+using System;
 using System.ComponentModel;
 using System.Windows;
-using DropZone.ViewModels;
 
 namespace DropZone.Views
 {
     /// <summary>
     /// Interaction logic for SendingWindow.xaml
     /// </summary>
-    public partial class TransferWindow : Window
+    public partial class TransferWindow : WindowBase
     {
-        private static int _instanceCount;
-
-        public static bool _appExisting;
-
-        private bool _windowExisting;
-
-        public static int InstanceCount => _instanceCount;
+        private volatile CloseReason _closeReason = CloseReason.UserClose;
 
         public TransferWindow()
         {
             InitializeComponent();
-            _instanceCount++;
             DataContextChanged += TransferWindow_DataContextChanged;
         }
 
@@ -35,15 +28,18 @@ namespace DropZone.Views
 
         private void Vm_Close(object sender, EventArgs e)
         {
-            _windowExisting = true;
+            _closeReason = CloseReason.RequestClose;
             Close();
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            if (!_appExisting && !_windowExisting)
+            if (Application.Current.MainWindow == null)
+                _closeReason = CloseReason.AppClose;
+
+            if (_closeReason == CloseReason.UserClose)
             {
-                if (MessageBox.Show("Cancel current process?", Title, MessageBoxButton.YesNo, MessageBoxImage.Question) ==
+                if (MessageBox.Show("Cancel current operation?", Title, MessageBoxButton.YesNo, MessageBoxImage.Question) ==
                     MessageBoxResult.No)
                 {
                     e.Cancel = true;
@@ -60,19 +56,16 @@ namespace DropZone.Views
             base.OnClosing(e);
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            if (DataContext is TransferViewModel vm)
-            {
-                vm.CleanUp();
-            }
-            _instanceCount--;
-            base.OnClosed(e);
-        }
-
         private void btnClose_OnClick(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private enum CloseReason
+        {
+            RequestClose,
+            UserClose,
+            AppClose
         }
     }
 }

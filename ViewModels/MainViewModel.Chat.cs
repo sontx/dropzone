@@ -1,29 +1,32 @@
-﻿using DropZone.Protocol;
+﻿using DropZone.Protocol.Chat;
 using DropZone.ViewModels.Messages;
-using System.Threading.Tasks;
 
 namespace DropZone.ViewModels
 {
     public partial class MainViewModel
     {
-        private Task HandleChatMessageAsync(Resolver resolver, string message)
-        {
-            return Task.Run(() =>
-            {
-                var neighbors = _station.Neighbors;
-                var remoteAddress = resolver.RemoteAddress;
-                var found = neighbors.Find(item => item.Address == remoteAddress) ??
-                            new Station.Neighbor { Address = remoteAddress };
+        private ChatServer _chatServer;
 
-                ChatWindowManager.Show(found);
-                MessengerInstance.Send(new ReceivedChatMessage(message, found));
-            });
+        private void InitializeChat()
+        {
+            _chatServer = new ChatServer
+            {
+                ChatHandler = HandleChatClient
+            };
+            _chatServer.Start();
+
+            MessengerInstance.Register<SendAttachmentMessage>(this, HandleSendAttachmentMessage);
         }
 
-        private async void HandleSendChatMessage(SendChatMessage msg)
+        private void CloseChat()
         {
-            var slaver = Slaver.ConnectToMaster(msg.To.Address);
-            await slaver.SendChatAsync(msg.Text);
+            _chatServer?.Stop();
+        }
+
+        private void HandleChatClient(ChatClient chatClient)
+        {
+            var neighbor = _station.GetNeighbor(chatClient.RemoteAddress);
+            ChatWindowManager.Show(neighbor, chatClient);
         }
 
         private void HandleSendAttachmentMessage(SendAttachmentMessage msg)

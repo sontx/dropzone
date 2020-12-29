@@ -1,12 +1,11 @@
-﻿using DropZone.ViewModels;
+﻿using DropZone.Utils;
+using DropZone.ViewModels;
 using Microsoft.Win32;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using DropZone.Utils;
 using Debugger = DropZone.Utils.Debugger;
 
 namespace DropZone.Views
@@ -14,7 +13,7 @@ namespace DropZone.Views
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : WindowBase
     {
         public MainWindow()
         {
@@ -25,17 +24,18 @@ namespace DropZone.Views
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            if (TransferWindow.InstanceCount > 0 && MessageBox.Show("Close this window will cancel all processes?", Title, MessageBoxButton.YesNo, MessageBoxImage.Question) ==
-                MessageBoxResult.No)
+            if (DataContext is MainViewModel vm && vm.ProcessingTaskCount > 0)
             {
-                e.Cancel = true;
-            }
-            else
-            {
-                TransferWindow._appExisting = true;
-                Application.Current.Shutdown();
+                if (MessageBox.Show("Close this window will cancel all operations?", Title, MessageBoxButton.YesNo, MessageBoxImage.Question) ==
+                    MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                    base.OnClosing(e);
+                    return;
+                }
             }
 
+            Application.Current.Shutdown();
             base.OnClosing(e);
         }
 
@@ -47,13 +47,8 @@ namespace DropZone.Views
 
         protected override void OnClosed(EventArgs e)
         {
-            if (DataContext is MainViewModel vm)
-            {
-                vm.Close();
-                Application.Current.Shutdown();
-            }
-
             base.OnClosed(e);
+            Application.Current.Shutdown();
         }
 
         private void HandleFiles(string[] files)
@@ -115,14 +110,14 @@ namespace DropZone.Views
 
         private void btnSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            var settingsWindow = new SettingsWindow {Owner = this};
+            var settingsWindow = new SettingsWindow { Owner = this };
             settingsWindow.ShowDialog();
             Debugger.IsEnabledLog = SettingsUtils.Get<AppSettings>().IsEnabledDebugger;
         }
 
         private void btnAbout_OnClick(object sender, RoutedEventArgs e)
         {
-            var aboutWindow = new AboutWindow{Owner = this};
+            var aboutWindow = new AboutWindow { Owner = this };
             aboutWindow.ShowDialog();
         }
     }

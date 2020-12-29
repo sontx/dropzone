@@ -1,9 +1,10 @@
 ﻿using DropZone.Protocol;
+using DropZone.Protocol.Chat;
+using DropZone.Utils;
 using DropZone.ViewModels;
 using DropZone.Views;
 using System;
 using System.Collections.Generic;
-using DropZone.Utils;
 
 namespace DropZone
 {
@@ -24,7 +25,7 @@ namespace DropZone
             return null;
         }
 
-        public static void Show(Station.Neighbor withNeighbor, bool active = false)
+        public static void Show(Station.Neighbor withNeighbor, ChatClient chatClient, bool active = false)
         {
             ThreadUtils.RunOnUiAndWait(() =>
             {
@@ -32,7 +33,9 @@ namespace DropZone
                 if (chatWindow == null)
                 {
                     chatWindow = new ChatWindow();
-                    var vm = new ChatViewModel(withNeighbor);
+                    var vm = chatClient != null
+                        ? new ChatViewModel(chatClient, withNeighbor)
+                        : new ChatViewModel(withNeighbor);
                     chatWindow.DataContext = vm;
                     chatWindow.Closed += ChatWindow_Closed;
                     chatWindow.Show();

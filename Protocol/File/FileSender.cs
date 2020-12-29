@@ -1,46 +1,34 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace DropZone.Protocol
+namespace DropZone.Protocol.File
 {
-    internal class FileSender : IDisposable
+    internal class FileSender : TcpClientBase
     {
-        private readonly string _host;
-        private readonly int _port;
-        private readonly string _name;
-        private readonly TcpClient _client;
-
         public long TotalBytes { get; private set; }
         public long SentBytes { get; private set; }
 
-        public string RemoteIdentify => (_client.Client.RemoteEndPoint as IPEndPoint)?.Address?.ToString();
-
-        public FileSender(string host, int port, string name)
+        public FileSender(string host, int port)
+            : base(host, port)
         {
-            _host = host;
-            _port = port;
-            _name = name;
-            _client = new TcpClient();
         }
 
         public void Connect()
         {
-            _client.Connect(_host, _port);
-            _client.ConfigSocket();
+            ConnectIfNeededAsync().Wait();
         }
 
         public void Send(string file, string baseDir)
         {
-            if (!File.Exists(file))
+            if (!System.IO.File.Exists(file))
                 return;
 
             TotalBytes = new FileInfo(file).Length;
 
-            using (var stream = _client.GetStream())
+            using (var stream = Stream)
             {
                 SendHeader(file, baseDir, stream);
                 SendBody(file, stream);
@@ -54,7 +42,7 @@ namespace DropZone.Protocol
             var fileInfo = new FileInfo(file);
             var name = fileInfo.Name;
             var size = fileInfo.Length;
-            var combined = $"{_name}|{name}|{GetRelativeDir(file, baseDir)}|{size}";
+            var combined = $"{name}|{GetRelativeDir(file, baseDir)}|{size}";
             var combinedBytes = Encoding.UTF8.GetBytes(combined);
 
             var lengthBytes = BitConverter.GetBytes(combinedBytes.Length);
@@ -85,7 +73,7 @@ namespace DropZone.Protocol
 #endif
             using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                var buffer = new byte[Constants.BUFFER_SIZE_SOCKET];
+                var buffer = new byte[Constants.BufferSizeSocket];
                 do
                 {
                     var readLength = fs.Read(buffer, 0, buffer.Length);
@@ -93,17 +81,12 @@ namespace DropZone.Protocol
                     stream.Write(buffer, 0, readLength);
                     SentBytes += readLength;
 #if DEBUG && LATENCY
-                    Thread.Sleep(random.Next(Constants.DEBUG_MIN_DELAY, Constants.DEBUG_MAX_DELAY));
+                    Thread.Sleep(random.Next(Constants.DebugMinDelay, Constants.DebugMaxDelay));
 #endif
                 } while (true);
 
                 stream.Flush();
             }
-        }
-
-        public void Dispose()
-        {
-            _client?.Dispose();
         }
     }
 }

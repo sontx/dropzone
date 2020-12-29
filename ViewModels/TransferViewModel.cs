@@ -1,6 +1,7 @@
 ﻿using DropZone.Utils;
 using GalaSoft.MvvmLight;
 using System;
+using System.Threading;
 using System.Windows;
 
 namespace DropZone.ViewModels
@@ -9,11 +10,13 @@ namespace DropZone.ViewModels
     {
         public event EventHandler Close;
 
+        protected volatile bool Canceled;
+
         private string _title;
         private string _currentFileName;
         private int _percent;
         private string _status;
-        protected volatile bool _canceled;
+        private readonly Timer _timer;
 
         public string Title
         {
@@ -39,13 +42,46 @@ namespace DropZone.ViewModels
             set => Set(ref _status, value);
         }
 
+        protected TransferViewModel()
+        {
+            _timer = new Timer(OnTimerCallback);
+        }
+
+        protected void StartTimer(int intervalMillis)
+        {
+            try
+            {
+                _timer.Change(0, intervalMillis);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        protected void StopTimer()
+        {
+            try
+            {
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        protected virtual void OnTimerCallback(object state)
+        {
+        }
+
         public void Cancel()
         {
             lock (this)
             {
-                if (_canceled)
+                if (Canceled)
                     return;
-                _canceled = true;
+                Canceled = true;
             }
 
             try
@@ -63,6 +99,7 @@ namespace DropZone.ViewModels
             try
             {
                 OnCleanUp();
+                _timer.Dispose();
             }
             catch
             {
@@ -74,7 +111,7 @@ namespace DropZone.ViewModels
 
         protected abstract void OnCleanUp();
 
-        protected void CloseWindow()
+        protected void CloseUi()
         {
             ThreadUtils.RunOnUiAndWait(() =>
             {

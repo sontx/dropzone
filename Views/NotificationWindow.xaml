@@ -1,4 +1,4 @@
-﻿<Window
+﻿<views:WindowBase
     x:Class="DropZone.Views.NotificationWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,6 +6,7 @@
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:DropZone.ViewModels"
+    xmlns:views="clr-namespace:DropZone.Views"
     Title="Notification Popup"
     Width="300"
     d:DataContext="{d:DesignInstance viewModels:NotificationViewModel,
@@ -69,4 +70,4 @@
             <ScaleTransform ScaleY="1" />
         </Grid.RenderTransform>
     </Grid>
-</Window>
+</views:WindowBase>

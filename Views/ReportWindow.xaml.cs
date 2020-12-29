@@ -8,7 +8,7 @@ namespace DropZone.Views
     /// <summary>
     /// Interaction logic for ReportWindow.xaml
     /// </summary>
-    public partial class ReportWindow : Window
+    public partial class ReportWindow : WindowBase
     {
         public ReportWindow()
         {

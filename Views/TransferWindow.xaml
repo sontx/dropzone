@@ -1,4 +1,4 @@
-﻿<Window
+﻿<views:WindowBase
     x:Class="DropZone.Views.TransferWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:DropZone"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:DropZone.ViewModels"
+    xmlns:views="clr-namespace:DropZone.Views"
     Title="{Binding Title}"
     Width="450"
     Height="180"
@@ -41,4 +42,4 @@
             </StackPanel>
         </Grid>
     </Grid>
-</Window>
+</views:WindowBase>
