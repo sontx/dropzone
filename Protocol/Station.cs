@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -19,6 +18,7 @@ namespace DropZone.Protocol
         private readonly ThreadWrapper _thread;
         private readonly Dictionary<string, Neighbor> _neighbors = new Dictionary<string, Neighbor>();
         private readonly Timer _timer;
+        private readonly string _id;
 
         public Action OnNeighborsChanged { get; set; }
 
@@ -36,6 +36,7 @@ namespace DropZone.Protocol
         public Station(string name)
         {
             Name = name;
+            _id = Guid.NewGuid().ToString();
             _client = new UdpClient();
             _thread = new ThreadWrapper
             {
@@ -55,28 +56,22 @@ namespace DropZone.Protocol
 
         private void ScanNeighbors()
         {
-            var localAddresses = GetAllIPAddresses();
-
             while (true)
             {
                 var from = new IPEndPoint(IPAddress.Any, 0);
                 var buffer = _client.Receive(ref from);
                 var header = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                var parts = header.Split(new[] { '|' }, 2);
 
                 Debugger.Log("Received broadcast header: " + header);
 
-                if (parts.Length != 2 || parts[0] != HeaderPrefix)
+                var pingInfo = PingInfo.Parse(header);
+                if (pingInfo == null || pingInfo.Id == _id)
                     continue;
 
                 var address = from.Address.ToString();
-                if (localAddresses.Contains(address))
-                    continue;
-
-                var name = parts[1];
                 var neighbor = new Neighbor
                 {
-                    Name = name,
+                    Name = pingInfo.Name,
                     LastOnline = DateTime.Now,
                     Address = address
                 };
@@ -91,22 +86,6 @@ namespace DropZone.Protocol
                         OnNeighborsChanged?.Invoke();
                 }
             }
-        }
-
-        private List<string> GetAllIPAddresses()
-        {
-            var ret = new List<string>();
-            foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                var ipProps = netInterface.GetIPProperties();
-                foreach (var address in ipProps.UnicastAddresses)
-                {
-                    if (address.Address.AddressFamily == AddressFamily.InterNetwork)
-                        ret.Add(address.Address.ToString());
-                }
-            }
-
-            return ret;
         }
 
         private void UpdateNeighborsStatus(object state)
@@ -132,7 +111,7 @@ namespace DropZone.Protocol
 
         private async void Ping()
         {
-            var header = $"{HeaderPrefix}|{Name}";
+            var header = new PingInfo { Id = _id, Name = Name }.BuildMessage();
             var bytes = Encoding.UTF8.GetBytes(header);
             await _client.SendAsync(bytes, bytes.Length, "255.255.255.255", Constants.StationPort);
         }
@@ -160,6 +139,35 @@ namespace DropZone.Protocol
             {
                 var name = string.IsNullOrEmpty(Name) ? "UNKNOWN" : Name;
                 return $"{name} [{Address}]";
+            }
+        }
+
+        private class PingInfo
+        {
+            public string Name { get; set; }
+            public string Id { get; set; }
+
+            public string BuildMessage()
+            {
+                return $"{HeaderPrefix}|{Name}|{Id}";
+            }
+
+            public static PingInfo Parse(string st)
+            {
+                if (string.IsNullOrEmpty(st))
+                    return null;
+
+                var parts = st.Split(new[] { '|' }, 3);
+                if (parts.Length != 3 || parts[0] != HeaderPrefix)
+                    return null;
+
+                var name = parts[1];
+                var id = parts[2];
+                return new PingInfo
+                {
+                    Name = name,
+                    Id = id
+                };
             }
         }
     }
